@@ -20,7 +20,7 @@ Version v1.0 20-03-2020
     <title>Alarm Web Panel</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+    <script src="https://kit.fontawesome.com/636c256db6.js" crossorigin="anonymous"></script>
     <style>
         html {
             font-size: 1rem;
@@ -56,16 +56,19 @@ Version v1.0 20-03-2020
     <div class="row">
         <div class="col">
             <h1>Alarm Status <span id="badge_active" style="display: none;"
-                                   class="badge badge-success">Active</span><span id="badge_disabled"
+                                   class="badge badge-success"><i class="fas fa-check"></i> Active</span><span id="badge_disabled"
                                                                                   style="display: none;"
-                                                                                  class="badge badge-secondary">Disabled</span>
-                <span id="badge_loading" class="badge badge-info">Loading...</span><span id="badge_alarm" style="display: none;" class="badge badge-danger">Alarm!</span></h1>
+                                                                                  class="badge badge-secondary"><i class="fas fa-times"></i> Disabled</span>
+                <span id="badge_loading" class="badge badge-info"><i class="fas fa-compass"></i> Loading...</span><span id="badge_alarm"
+                                                                                         style="display: none;"
+                                                                                         class="badge badge-danger"><i class="fas fa-bell"></i> Alarm!</span>
+            </h1>
         </div>
     </div>
     <div class="row">
         <div class="col">
             <div id="alert_loading" style="display: none;" class="alert alert-info" role="alert">
-                Sending command to alarm...
+                <i class="fas fa-rocket"></i> Sending command to alarm...
             </div>
         </div>
     </div>
@@ -73,13 +76,13 @@ Version v1.0 20-03-2020
         <div class="col">
             <button id="disableButton" type="button" class="btn btn-secondary btn-lg btn-block" data-toggle="modal"
                     data-target="#disableModal" disabled>
-                Disable
+                <i class="fas fa-times"></i> Disable
             </button>
         </div>
         <div class="col">
             <button id="enableButton" type="button" class="btn btn-success btn-lg btn-block" data-toggle="modal"
                     data-target="#enableModal" disabled>
-                Enable
+                <i class="fas fa-check"></i> Enable
             </button>
         </div>
     </div>
@@ -116,7 +119,17 @@ Version v1.0 20-03-2020
                 </tr>
                 </tbody>
             </table>
-            <p id="json"></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p class="text text-center">
+                Developed by Alessandro Annese
+                <br>
+                <a class="mr-2" href="https://github.com/Ax3lFernus/" target="_blank"><i class="fab fa-github"></i></a>
+                <a class="mr-2" href="https://www.linkedin.com/in/alessandro-annese-79683913b/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="mailto:a.annese99@gmail.com"><i class="fas fa-envelope"></i></a>
+            </p>
         </div>
     </div>
 </div>
@@ -196,7 +209,7 @@ Version v1.0 20-03-2020
                     $("#disableButton").prop("disabled", true);
                 }
 
-                if(data.alarm === true) {
+                if (data.alarm === true) {
                     $("#badge_alarm").show();
                     $("#badge_active").hide();
                     $("#badge_disabled").hide();
@@ -220,11 +233,11 @@ Version v1.0 20-03-2020
                     $("#tamper_close").show();
                 }
 
-                if(onLoad) {
+                if (onLoad) {
                     checkId = setInterval(check, data.active === true ? 5000 : 1000);
                     onLoad = false;
                     previousState = data.active;
-                }else if (previousState !== data.active){
+                } else if (previousState !== data.active) {
                     clearInterval(checkId);
                     checkAlarmStatus.abort();
                     checkId = setInterval(check, data.active === true ? 5000 : 1000);
