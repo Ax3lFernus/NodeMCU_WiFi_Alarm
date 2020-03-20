@@ -1,2 +1,2 @@
-# NodeMCU_WiFi_Alarm
+# NodeMCU WiFi Alarm
 A simple software that makes NodeMCU a Wireless alarm center.
