@@ -1,0 +1,263 @@
+<!---
+ /$$   /$$                 /$$           /$$      /$$  /$$$$$$  /$$   /$$        /$$$$$$  /$$
+| $$$ | $$                | $$          | $$$    /$$$ /$$__  $$| $$  | $$       /$$__  $$| $$
+| $$$$| $$  /$$$$$$   /$$$$$$$  /$$$$$$ | $$$$  /$$$$| $$  \__/| $$  | $$      | $$  \ $$| $$  /$$$$$$   /$$$$$$  /$$$$$$/$$$$
+| $$ $$ $$ /$$__  $$ /$$__  $$ /$$__  $$| $$ $$/$$ $$| $$      | $$  | $$      | $$$$$$$$| $$ |____  $$ /$$__  $$| $$_  $$_  $$
+| $$  $$$$| $$  \ $$| $$  | $$| $$$$$$$$| $$  $$$| $$| $$      | $$  | $$      | $$__  $$| $$  /$$$$$$$| $$  \__/| $$ \ $$ \ $$
+| $$\  $$$| $$  | $$| $$  | $$| $$_____/| $$\  $ | $$| $$    $$| $$  | $$      | $$  | $$| $$ /$$__  $$| $$      | $$ | $$ | $$
+| $$ \  $$|  $$$$$$/|  $$$$$$$|  $$$$$$$| $$ \/  | $$|  $$$$$$/|  $$$$$$/      | $$  | $$| $$|  $$$$$$$| $$      | $$ | $$ | $$
+|__/  \__/ \______/  \_______/ \_______/|__/     |__/ \______/  \______/       |__/  |__/|__/ \_______/|__/      |__/ |__/ |__/
+NodeMcu Alarm Web Panel
+Developed by Alessandro Annese
+GitHub: Ax3lFernus
+E-Mail: a.annese99@gmail.com
+Version v1.0 20-03-2020
+--->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alarm Web Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <style>
+        html {
+            font-size: 1rem;
+        }
+
+        @media (min-width: 200px) {
+            html {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (min-width: 576px) {
+            html {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            html {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (min-width: 992px) {
+            html {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Alarm Status <span id="badge_active" style="display: none;"
+                                   class="badge badge-success">Active</span><span id="badge_disabled"
+                                                                                  style="display: none;"
+                                                                                  class="badge badge-secondary">Disabled</span>
+                <span id="badge_loading" class="badge badge-info">Loading...</span><span id="badge_alarm" style="display: none;" class="badge badge-danger">Alarm!</span></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div id="alert_loading" style="display: none;" class="alert alert-info" role="alert">
+                Sending command to alarm...
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button id="disableButton" type="button" class="btn btn-secondary btn-lg btn-block" data-toggle="modal"
+                    data-target="#disableModal" disabled>
+                Disable
+            </button>
+        </div>
+        <div class="col">
+            <button id="enableButton" type="button" class="btn btn-success btn-lg btn-block" data-toggle="modal"
+                    data-target="#enableModal" disabled>
+                Enable
+            </button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <h1>Areas Status</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Door</td>
+                    <td>
+                        <p id="door_open" style="display:none;" class="text text-warning font-weight-bold">Open</p>
+                        <p id="door_close" style="display:none;" class="text text-success font-weight-bold">Close</p>
+                        <p id="door_loading" class="text text-secondary font-weight-bold">Loading...</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Tamper Line</td>
+                    <td>
+                        <p id="tamper_open" style="display:none;" class="text text-warning font-weight-bold">Open</p>
+                        <p id="tamper_close" style="display:none;" class="text text-success font-weight-bold">Close</p>
+                        <p id="tamper_loading" class="text text-secondary font-weight-bold">Loading...</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p id="json"></p>
+        </div>
+    </div>
+</div>
+<!-- Active Modal -->
+<div class="modal fade" id="enableModal" tabindex="-1" role="dialog"
+     aria-labelledby="enableModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enableModalLabel">Are you sure you want to activate the alarm?</h5>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" onclick="setAlarm('on')" data-dismiss="modal">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="disableModal" tabindex="-1" role="dialog"
+     aria-labelledby="disableModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="disableModalLabel">Are you sure you want to deactivate the alarm?</h5>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" onclick="setAlarm('off')" data-dismiss="modal">Yes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<script>
+    let checkId, checkAlarmStatus, onLoad = true, previousState = false;
+    $(document).ready(function () {
+        check();
+    });
+
+    function check() {
+        checkAlarmStatus = $.ajax({
+            cache: false,
+            timeout: 2000,
+            type: "GET",
+            url: "http://192.168.1.165/status",
+            dataType: 'json',
+            error: function (error) {
+            },
+            success: function (data) {
+                $('#json').text(JSON.stringify(data));
+                $("#badge_loading").hide();
+                $("#door_loading").hide();
+                $("#tamper_loading").hide();
+                $("#alert_loading").hide();
+                if (data.active === true) {
+                    $("#badge_active").show();
+                    $("#badge_disabled").hide();
+                    $("#badge_alarm").hide();
+                    $("#enableButton").prop("disabled", true);
+                    $("#disableButton").prop("disabled", false);
+                } else {
+                    $("#badge_active").hide();
+                    $("#badge_alarm").hide();
+                    $("#badge_disabled").show();
+                    $("#enableButton").prop("disabled", false);
+                    $("#disableButton").prop("disabled", true);
+                }
+
+                if(data.alarm === true) {
+                    $("#badge_alarm").show();
+                    $("#badge_active").hide();
+                    $("#badge_disabled").hide();
+                } else {
+                    $("#badge_alarm").hide();
+                }
+
+                if (data.door === "open") {
+                    $("#door_open").show();
+                    $("#door_close").hide();
+                } else {
+                    $("#door_open").hide();
+                    $("#door_close").show();
+                }
+
+                if (data.h24 === "open") {
+                    $("#tamper_open").show();
+                    $("#tamper_close").hide();
+                } else {
+                    $("#tamper_open").hide();
+                    $("#tamper_close").show();
+                }
+
+                if(onLoad) {
+                    checkId = setInterval(check, data.active === true ? 5000 : 1000);
+                    onLoad = false;
+                    previousState = data.active;
+                }else if (previousState !== data.active){
+                    clearInterval(checkId);
+                    checkAlarmStatus.abort();
+                    checkId = setInterval(check, data.active === true ? 5000 : 1000);
+                    previousState = !previousState;
+                }
+            }
+        });
+    }
+
+    setAlarm = function (value) {
+        clearInterval(checkId);
+        checkAlarmStatus.abort();
+        $("#badge_loading").show();
+        $("#alert_loading").show();
+        $("#badge_active").hide();
+        $("#badge_disabled").hide();
+        $("#badge_alarm").hide();
+        $("#enableButton").prop("disabled", true);
+        $("#disableButton").prop("disabled", true);
+        setTimeout(() =>
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "http://192.168.1.165/1/" + value,
+                dataType: 'json',
+                error: function (error) {
+                    console.log(error);
+                },
+                complete: () => {
+                    check();
+                    onLoad = true;
+                }
+            }), 1000);
+    };
+</script>
+</html>
