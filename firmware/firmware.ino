@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.0 20-03-2020
+ * Version v2.0.1 20-03-2020
  */
 
 // Load Wi-Fi library
@@ -21,9 +21,7 @@
 #define SS_PIN D4
 #define RST_PIN D3
 
-MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance.
-int statuss = 0;                  //MFRC STATUS
-int out = 0;                      //MFRC OUT
+MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
 // Network Credentials
 const char *ssid = "";     //Network SSID
@@ -43,12 +41,15 @@ unsigned long previousTime = 0;
 const long timeoutTime = 2000;
 
 // Alarm time counting
-// Current time
-unsigned long alarmCurrentTime = millis();
-// Previous time
 unsigned long alarmPreviousTime = 0;
-// Define siren sound time in case of alarm (in milliseconds, example: 60000ms = 60s)
-const long alarmTimeout = 10000;
+// Define siren sound time in case of alarm (in milliseconds, example: 10000ms = 10s)
+const long alarmTimeout = 5000;
+
+// Door open time counting
+// Previous time
+unsigned long doorPreviousTime = 0;
+// Defines the entry time since the door is opened (in milliseconds, example: 10000ms = 10s)
+const long doorTimeout = 10000;
 
 // Board Pin setup
 const int doorPin = D1, boardLed = D0, h24Pin = D2, activeAlarmLed = D8;
@@ -80,6 +81,7 @@ void setup()
 void loop()
 {
   WiFiClient client = server.available(); // Listen for incoming clients
+  currentTime = millis();
   rfidCardScanner();
   // H24 Line protection
   if (digitalRead(h24Pin) == HIGH)
@@ -93,9 +95,12 @@ void loop()
     digitalWrite(activeAlarmLed, HIGH);
 
     if (digitalRead(doorPin) == HIGH)
-    { //If door is opened, start the siren alarm
-      inAlarm = true;
+    { //If door is opened, start the counting time
+      if (!(currentTime - doorPreviousTime <= doorTimeout))
+        inAlarm = true;
     }
+    else
+      doorPreviousTime = currentTime;
   }
   else
   {
@@ -103,10 +108,11 @@ void loop()
     digitalWrite(activeAlarmLed, LOW);
   }
 
-  alarmCurrentTime = millis();
+  // In alarm status
   if (inAlarm)
   {
-    if (alarmCurrentTime - alarmPreviousTime <= alarmTimeout)
+    //Alarm time counting
+    if (currentTime - alarmPreviousTime <= alarmTimeout)
     {
       digitalWrite(boardLed, LOW);
     }
@@ -119,13 +125,12 @@ void loop()
   }
   else
   {
-    alarmPreviousTime = alarmCurrentTime;
+    alarmPreviousTime = currentTime;
     digitalWrite(boardLed, HIGH);
   }
 
   if (client)
-  { // If a new client connects,
-    //Serial.println("New Client.");          // print a message out in the serial port
+  {                          // If a new client connects,
     String currentLine = ""; // make a String to hold incoming data from the client
     currentTime = millis();
     previousTime = currentTime;
@@ -148,7 +153,7 @@ void loop()
             client.println("Access-Control-Allow-Origin: *");
             client.println("Access-Control-Max-Age: 2520");
             client.println("Access-Control-Allow-Methods: GET, PUT, DELETE, XMODIFY");
-            client.println("Content-type:text/html");
+            client.println("Content-type:application/json");
             client.println("Connection: close");
             client.println();
 
@@ -226,17 +231,33 @@ void rfidCardScanner()
   if (content.substring(1) == "92 92 AA 89") //change UID of the card that you want to give access
   {
     Serial.println(" Access Granted ");
-    if (inAlarm == true)
+    if ((digitalRead(doorPin) == HIGH || digitalRead(h24Pin) == HIGH) && alarmActive == false)
     {
-      inAlarm = false;
-      alarmActive = false;
-      alarmPreviousTime = 0;
+      digitalWrite(boardLed, LOW);
+      delay(500);
+      digitalWrite(boardLed, HIGH);
+      delay(500);
+      digitalWrite(boardLed, LOW);
+      delay(500);
+      digitalWrite(boardLed, HIGH);
+      delay(500);
+      digitalWrite(boardLed, LOW);
+      delay(500);
       digitalWrite(boardLed, HIGH);
     }
     else
-      alarmActive = !alarmActive;
-    statuss = 1;
-    delay(1000);
+    {
+      if (inAlarm == true)
+      {
+        inAlarm = false;
+        alarmActive = false;
+        alarmPreviousTime = 0;
+        digitalWrite(boardLed, HIGH);
+      }
+      else
+        alarmActive = !alarmActive;
+      delay(1000);
+    }
   }
   else
   {
