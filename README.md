@@ -57,7 +57,7 @@ If you install the id for the first time you will need:
 6. Click on the arrow pointing to the right to flash the card.
 7. That's all!
 
-**:information_source: Note:** if you don't know the uid of your card you will need to: flash the card -> open the serial monitor (seleziona il baud rate 115200) -> scan the RFID card -> copy the UID that comes out in the monitor -> go to step 5.
+**:information_source: Note:** if you don't know the uid of your card you will need to: flash the card -> open the serial monitor (select the value 115200 as baud rate) -> scan the RFID card -> copy the UID that comes out in the monitor -> go to step 5.
 ### Install Web Panel
 
 ## The Author
