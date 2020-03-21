@@ -18,8 +18,16 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
 
 ## Features
 ### RC522 Support
+With the RFID-RC522 card it is possible to activate and deactivate the alarm via a tag or an RFID card.
 ### Wireless Connectivity
+The NodeMCU card was born to have an integrated WiFi NIC. This functionality is used to check the card to read its status through the [APIs](#apis).
 ### APIs
+The APIs provide commands to check and modify the alarm status. 
+It is necessary to know the local IP of the card in order to interact with it through HTTP GET requests, the answers are in json format.
+Here is the list of possible requests:
+1. To know the status of the card just send the request `http://<CARD_IP>/status`
+2. To activate the alarm just send the request `http://<CARD_IP>/1/on`
+3. To deactivate the alarm just send the request `http://<CARD_IP>/1/off`
 ### Web Panel
 
 ## Installation
