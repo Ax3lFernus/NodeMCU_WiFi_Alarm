@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1.2 21-03-2020
+ * Version v2.1.3 21-03-2020
  */
 
 // Load Wi-Fi library
@@ -23,9 +23,10 @@
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
-// Network Credentials
+// Network and UID Credentials
 const char *ssid = "";     //Network SSID
 const char *password = ""; //Network PASSWORD
+const char *UID = "";      //UID Card Code
 
 // Set WebServer Port to 80
 WiFiServer server(80);
@@ -172,20 +173,20 @@ void rfidCardScanner()
     return;
   }
   //Show UID on serial monitor
-  //Serial.println();
-  //Serial.print(" UID tag :");
+  Serial.println();
+  Serial.print(" UID tag :");
   String content = "";
   byte letter;
   for (byte i = 0; i < mfrc522.uid.size; i++)
   {
-    //Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-    //Serial.print(mfrc522.uid.uidByte[i], HEX);
+    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+    Serial.print(mfrc522.uid.uidByte[i], HEX);
     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
     content.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
   content.toUpperCase();
-  //Serial.println();
-  if (content.substring(1) == "92 92 AA 89") //change UID of the card that you want to give access
+  Serial.println();
+  if (content.substring(1) == UID) //change UID of the card that you want to give access
   {
     Serial.println(" Access Granted ");
     if (digitalRead(h24Pin) == HIGH && alarmActive == false && inAlarm == false)
@@ -216,7 +217,7 @@ void rfidCardScanner()
   }
   else
   {
-    //Serial.println(" Access Denied ");
+    Serial.println(" Access Denied ");
     delay(3000);
   }
 }
@@ -249,12 +250,12 @@ void alarmCheck()
       {
         inAlarm = true;
       }
-    } ///CHECK IF I HAVE TO ADD ELSE
+    }
   }
 }
 
 /**
-  * Set and manage the alarm status.
+  * Set the alarm status.
   * Parameters: value -> true: Set the alarm on, false: Set the alarm off
   */
 void setAlarm(bool value)
@@ -274,6 +275,11 @@ void setAlarm(bool value)
   }
 }
 
+/**
+  * Check the siren status.
+  * If inAlarm is true starts the siren
+  * Else do nothing
+  */
 void sirenCheck()
 {
   // In alarm status
