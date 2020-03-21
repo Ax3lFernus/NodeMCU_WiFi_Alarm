@@ -1,4 +1,4 @@
-# <img src="./logo/logo.svg" alt="NodeMCU WiFi Alarm Logo" width="50px"> NodeMCU WiFi Alarm
+# <img src="./docs/logo/logo.svg" alt="NodeMCU WiFi Alarm Logo" width="50px"> NodeMCU WiFi Alarm
 A simple firmware that makes NodeMCU a Wireless alarm center.
 
 ![](https://img.shields.io/github/license/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge) ![](https://img.shields.io/github/last-commit/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge) ![](https://img.shields.io/github/release-date/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge)
