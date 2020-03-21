@@ -54,7 +54,7 @@ If you install the id for the first time you will need:
 
 4. Go to File -> Open -> select 'firmware.ino' file from the repository directory on your pc -> when the code opens go to "Network SSID" and "Network PASSWORD" in the code and insert your network credentials between the quotes<br>
 `// Network and UID Credentials`<br>
-`const char *ssid = "<YOUR WIFI NAME HERE>;          //Network SSID`<br>
+`const char *ssid = "<YOUR WIFI NAME HERE>";          //Network SSID`<br>
 `const char *password = "<YOUR WIFI PASSWORD HERE>"; //Network PASSWORD`<br>
 `const char *UID = "<UID CARD HERE>";                //UID Card Code`<br>
 5. In "UID Card Code" enter the code of your card for enable/disable the alarm.
@@ -63,7 +63,11 @@ If you install the id for the first time you will need:
 
 **:information_source: Note:** if you don't know the uid of your card you will need to: flash the card -> open the serial monitor (select the value 115200 as baud rate) -> scan the RFID card -> copy the UID that comes out in the monitor -> go to step 5.
 ### Install Web Panel
-
+The web panel doesn't require installation so you can open `./webServer/index.html` with a browser without using additional programs. The only step is to open the `index.html` with a text editor (es. Notepad++) and insert the ip of the card in the local network in the field `nodemcu_ip`:<br>
+`let nodemcu_ip = "<NODEMCU IP HERE>" //Set your NodeMCU IP ex: 192.168.1.1`<br>
+However, you can upload the `index.html` to a web server to be able to visit it from other devices on the same local network.<br>
+<br>
+**:warning: Warning:** the panel must be started on a device connected in the same local network as the NodeMCU board.
 ## The Author
 This software was developed by Alessandro Annese.<br>
 You can follow me on:<br>
