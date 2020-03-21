@@ -40,6 +40,24 @@ The role of each pin used in the board is described below:
 |D8|Indicates the alarm status (enabled/disabled)|
 
 ### Flash firmware
+You can flash the firmware on the NodeMCU via the [Arduino IDE](https://www.arduino.cc/en/Main/Software).
+If you install the id for the first time you will need:
+1. Go to File -> Preferences -> Add the link http://arduino.esp8266.com/stable/package_esp8266com_index.json in "Additional Boards Manager URLs" -> Click "OK"
+2. Go to Tools -> Board -> click on "Boards Manager" -> search "esp8266" -> select leatest version -> click "Install" -> when finished click "Close"
+3. Go to Tools and check this configurations:
+
+  | Name | Value |
+  |------|-------|
+  | Board| NodeMCU 1.0 (ESP-12E Module)|
+  |Upload Speed| 115200|
+  |Port|Select the COM port where the board is connected|  
+
+4. Go to File -> Open -> select 'firmware.ino' file from the repository directory on your pc -> when the code opens go to "Network SSID" and "Network PASSWORD" in the code and insert your network credentials between the quotes
+5. In "UID Card Code" enter the code of your card for enable/disable the alarm.
+6. Click on the arrow pointing to the right to flash the card.
+7. That's all!
+
+**:information_source: Note:** if you don't know the uid of your card you will need to: flash the card -> open the serial monitor (seleziona il baud rate 115200) -> scan the RFID card -> copy the UID that comes out in the monitor -> go to step 5.
 ### Install Web Panel
 
 ## The Author
