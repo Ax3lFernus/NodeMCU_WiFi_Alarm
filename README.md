@@ -54,9 +54,9 @@ If you install the id for the first time you will need:
 
 4. Go to File -> Open -> select 'firmware.ino' file from the repository directory on your pc -> when the code opens go to "Network SSID" and "Network PASSWORD" in the code and insert your network credentials between the quotes<br>
 `// Network and UID Credentials`<br>
-`const char *ssid = "";     //Network SSID`<br>
-`const char *password = ""; //Network PASSWORD`<br>
-`const char *UID = "";      //UID Card Code`<br>
+`const char *ssid = "<YOUR WIFI NAME HERE>;          //Network SSID`<br>
+`const char *password = "<YOUR WIFI PASSWORD HERE>"; //Network PASSWORD`<br>
+`const char *UID = "<UID CARD HERE>";                //UID Card Code`<br>
 5. In "UID Card Code" enter the code of your card for enable/disable the alarm.
 6. Click on the arrow pointing to the right to flash the card.
 7. That's all!
