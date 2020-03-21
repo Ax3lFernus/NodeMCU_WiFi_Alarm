@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1.1 21-03-2020
+ * Version v2.1.2 21-03-2020
  */
 
 // Load Wi-Fi library
@@ -24,7 +24,7 @@
 MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
 // Network Credentials
-const char *ssid = ""; //Network SSID
+const char *ssid = "";     //Network SSID
 const char *password = ""; //Network PASSWORD
 
 // Set WebServer Port to 80
@@ -235,7 +235,7 @@ void alarmCheck()
   }
 
   // Alarm active control
-  if (alarmActive)
+  if (alarmActive && inAlarm == false)
   {
     if (!(millis() - doorExitPreviousTime <= doorExitTimeout))
     {
