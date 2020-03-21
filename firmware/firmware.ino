@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.0.1 20-03-2020
+ * Version v2.0.2 21-03-2020
  */
 
 // Load Wi-Fi library
@@ -231,8 +231,8 @@ void rfidCardScanner()
   if (content.substring(1) == "92 92 AA 89") //change UID of the card that you want to give access
   {
     Serial.println(" Access Granted ");
-    if ((digitalRead(doorPin) == HIGH || digitalRead(h24Pin) == HIGH) && alarmActive == false)
-    {
+    if (digitalRead(h24Pin) == HIGH && alarmActive == false && inAlarm == false)
+    { // If h24Pin is open, send acustic feedback via siren
       digitalWrite(boardLed, LOW);
       delay(500);
       digitalWrite(boardLed, HIGH);
