@@ -11,7 +11,7 @@ NodeMcu Alarm Web Panel
 Developed by Alessandro Annese
 GitHub: Ax3lFernus
 E-Mail: a.annese99@gmail.com
-Version v1.0 20-03-2020
+Version v1.0.1 21-03-2020
 --->
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +21,9 @@ Version v1.0 20-03-2020
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/636c256db6.js" crossorigin="anonymous"></script>
+	<script>
+		let nodemcu_ip = "" //Set your NodeMCU IP ex: 192.168.1.1
+	</script>
     <style>
         html {
             font-size: 1rem;
@@ -185,7 +188,7 @@ Version v1.0 20-03-2020
             cache: false,
             timeout: 2000,
             type: "GET",
-            url: "http://192.168.1.165/status",
+            url: "http://" + nodemcu_ip + "/status",
             dataType: 'json',
             error: function (error) {
             },
@@ -261,7 +264,7 @@ Version v1.0 20-03-2020
             $.ajax({
                 cache: false,
                 type: "GET",
-                url: "http://192.168.1.165/1/" + value,
+                url: "http://" + nodemcu_ip +"/1/" + value,
                 dataType: 'json',
                 error: function (error) {
                     console.log(error);
