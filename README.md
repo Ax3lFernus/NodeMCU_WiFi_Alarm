@@ -24,7 +24,21 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
 
 ## Installation
 ### Wiring Diagram
-![](./docs/WiringDiagram.png)
+<img src="./docs/WiringDiagram.png" alt="Wiring Diagram" width="60%">
+
+The role of each pin used in the board is described below:
+|Pin|Description|
+| ------------ | ------------ |
+|D0|It gives the signal to the siren to make it sound|
+|D1|Detects the status of the door contact|
+|D2|Detects the status of the tamper contact|
+|D3|Reserved for the RST pin of the RFID board|
+|D4|Reserved for the SDA pin of the RFID board|
+|D5|Reserved for the SCK pin of the RFID board|
+|D6|Reserved for the MISO pin of the RFID board|
+|D7|Reserved for the MOSI pin of the RFID board|
+|D8|Indicates the alarm status (enabled/disabled)|
+
 ### Flash firmware
 ### Install Web Panel
 
