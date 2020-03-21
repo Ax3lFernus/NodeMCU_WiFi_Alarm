@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1 21-03-2020
+ * Version v2.1.1 21-03-2020
  */
 
 // Load Wi-Fi library
@@ -24,7 +24,7 @@
 MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
 // Network Credentials
-const char *ssid = "";     //Network SSID
+const char *ssid = ""; //Network SSID
 const char *password = ""; //Network PASSWORD
 
 // Set WebServer Port to 80
@@ -127,7 +127,7 @@ void loop()
             }
             else if (header.indexOf("GET /status") >= 0)
             {
-              client.println("{\"door\":");
+              client.print("{\"door\":");
               client.print(digitalRead(doorPin) == HIGH ? "\"open\"" : "\"closed\"");
               client.print(", \"h24\":");
               client.print(digitalRead(h24Pin) == HIGH ? "\"open\"" : "\"closed\"");
@@ -187,7 +187,7 @@ void rfidCardScanner()
   //Serial.println();
   if (content.substring(1) == "92 92 AA 89") //change UID of the card that you want to give access
   {
-    //Serial.println(" Access Granted ");
+    Serial.println(" Access Granted ");
     if (digitalRead(h24Pin) == HIGH && alarmActive == false && inAlarm == false)
     { // If h24Pin is open, send acustic feedback via siren
       digitalWrite(siren, LOW);
@@ -226,7 +226,8 @@ void rfidCardScanner()
   * If alarm on, check the pins
   * Else do nothing
   */
-void alarmCheck(){
+void alarmCheck()
+{
   // H24 Line protection
   if (digitalRead(h24Pin) == HIGH)
   {
@@ -236,14 +237,16 @@ void alarmCheck(){
   // Alarm active control
   if (alarmActive)
   {
-    if(!(millis() - doorEnterPreviousTime <= doorEnterTimeout))
+    if (!(millis() - doorExitPreviousTime <= doorExitTimeout))
     {
-      if(digitalRead(doorPin) == HIGH && doorOpened == false){
-        doorExitPreviousTime = millis();
+      if (digitalRead(doorPin) == HIGH && doorOpened == false)
+      {
+        doorEnterPreviousTime = millis();
         doorOpened = true;
       }
 
-      if(millis() - doorExitPreviousTime <= doorExitTimeout){
+      if ((!(millis() - doorEnterPreviousTime <= doorEnterTimeout)) && doorOpened == true)
+      {
         inAlarm = true;
       }
     } ///CHECK IF I HAVE TO ADD ELSE
@@ -254,13 +257,14 @@ void alarmCheck(){
   * Set and manage the alarm status.
   * Parameters: value -> true: Set the alarm on, false: Set the alarm off
   */
-void setAlarm(bool value){
+void setAlarm(bool value)
+{
   doorOpened = false;
-  if(value)
+  if (value)
   { //SET ALARM TO ON (with exit time)
     alarmActive = true;
     digitalWrite(activeAlarmLed, HIGH);
-    doorEnterPreviousTime = millis();
+    doorExitPreviousTime = millis();
   }
   else
   { //SET ALARM TO OFF
@@ -270,7 +274,8 @@ void setAlarm(bool value){
   }
 }
 
-void sirenCheck(){
+void sirenCheck()
+{
   // In alarm status
   if (inAlarm)
   {
