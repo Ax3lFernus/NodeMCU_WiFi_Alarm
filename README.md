@@ -1,7 +1,7 @@
 # NodeMCU WiFi Alarm
 A simple firmware that makes NodeMCU a Wireless alarm center.
 
-![](https://img.shields.io/github/last-commit/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge) ![](https://img.shields.io/github/release-date/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge) ![](https://img.shields.io/github/issues/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge)
+![](https://img.shields.io/github/license/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge) ![](https://img.shields.io/github/last-commit/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge) ![](https://img.shields.io/github/release-date/Ax3lFernus/NodeMCU_WiFi_Alarm?style=for-the-badge)
 
 ## Table of Contents
 - [Features](#features)
@@ -14,6 +14,7 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
   - [Install Web Panel](#install-web-panel)
 - [The author](#the-author)
 - [License](#license)
+
 ## Features
 ### RC522 Support
 ### Wireless Connectivity
@@ -31,3 +32,7 @@ You can follow me on:<br>
 [GitHub](https://github.com/Ax3lFernus)
 
 ## License
+[BSD 3-Clause License](https://github.com/Ax3lFernus/NodeMCU_WiFi_Alarm/blob/master/LICENSE)
+
+Copyright &copy; 2020, Alessandro Annese<br>
+All rights reserved.
