@@ -10,9 +10,10 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
   - [APIs](#apis)
   - [Web Panel](#web-panel)
 - [Installation](#installation)
+  - [Pinout desctiption](#pinout-description)
   - [Flash firmware](#flash-firmware)
   - [Install Web Panel](#install-web-panel)
-- [The author](#the-author)
+- [The Author](#the-author)
 - [License](#license)
 
 ## Features
@@ -22,6 +23,7 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
 ### Web Panel
 
 ## Installation
+### Pinout description
 ### Flash firmware
 ### Install Web Panel
 
