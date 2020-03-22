@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1.4 22-03-2020
+ * Version v2.1.5 22-03-2020
  */
 
 // Load Wi-Fi library
