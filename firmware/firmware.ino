@@ -46,13 +46,18 @@ unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm (in milliseconds, example: 10000ms = 10s)
 const long alarmTimeout = 5000;
 
-// Door open/close time counting
+// Door time counting
 // Previous time
 unsigned long doorExitPreviousTime = 0, doorEnterPreviousTime = 0;
 // Defines the entry time since the door is opened (in milliseconds, example: 10000ms = 10s)
 const long doorEnterTimeout = 10000;
 // Defines the exit time since the alarm is set to active (in milliseconds)
 const long doorExitTimeout = 10000;
+
+// Tamper time counting
+unsigned long tamperPreviousTime = 0;
+// Time that allows the tamper line to be opened when the alarm is deactivated (in milliseconds, example: 10000ms = 10s)
+const long tamperTimeout = 10000;
 
 // Board Pin setup
 const int doorPin = D1, siren = D0, h24Pin = D2, activeAlarmLed = D8;
@@ -79,6 +84,7 @@ void setup()
   server.begin();
   SPI.begin();        // Initiate  SPI bus
   mfrc522.PCD_Init(); // Initiate MFRC522
+  tamperPreviousTime = millis();
 }
 
 void loop()
@@ -221,10 +227,11 @@ void rfidCardScanner()
 void alarmCheck()
 {
   // H24 Line protection
-  if (digitalRead(h24Pin) == HIGH)
-  {
-    inAlarm = true;
-  }
+  if ((!(millis() - tamperPreviousTime <= tamperTimeout)))
+    if (digitalRead(h24Pin) == HIGH)
+    {
+      inAlarm = true;
+    }
 
   // Alarm active control
   if (alarmActive && inAlarm == false)
@@ -271,6 +278,7 @@ void setAlarm(bool value)
     else
     {
       alarmActive = true;
+      tamperPreviousTime = 0;
       digitalWrite(activeAlarmLed, HIGH);
       doorExitPreviousTime = millis();
     }
@@ -280,6 +288,7 @@ void setAlarm(bool value)
     inAlarm = false;
     alarmActive = false;
     digitalWrite(activeAlarmLed, LOW);
+    tamperPreviousTime = millis();
   }
 }
 
