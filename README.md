@@ -20,7 +20,7 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
 ## Features
 ### RC522 Support
 With the RFID-RC522 card it is possible to activate and deactivate the alarm via an RFID tag or card.
-<img src="./docs/images/rfid_card.jpg" alt="RFID Card" width=40%>&nbsp;<img src="./docs/images/rfid_tag.jpg" alt="RFID Tag" width="50%">
+<img src="./docs/images/rfid_card.jpg" alt="RFID Card" width=40%>&nbsp;<img src="./docs/images/rfid_tag.jpg" alt="RFID Tag" width="35%">
 ### Wireless Connectivity
 The NodeMCU card was born to have an integrated WiFi NIC. This functionality is used to check the card to read its status through the [APIs](#apis).
 ### APIs
@@ -29,30 +29,30 @@ It is necessary to know the local IP of the card in order to interact with it th
 Here is the list of possible requests:
 <ol>
 <li>
-To know the status of the card just send the request `http://<CARD_IP>/status`. The answer is formatted as 
+To know the status of the card just send the request to http://CARD_IP/status. The answer is formatted as 
 
 | Key | Type | Values | Description |
 |---|---|---|---|
-|door| String | `open` or `closed` |  |
-|h24 | String | `open` or `closed` |  |
-|active| Bool| `true` or `false` | |
-|alarm | Bool| `true` or `false` | |
+|door| String | `open` or `closed` | The value indicates whether the line of pin `D1` is open or closed. |
+|h24 | String | `open` or `closed` | The value indicates whether the line of pin `D2` (tamper) is open or closed. |
+|active| Bool| `true` or `false` | Indicates the alarm status: active (`true`) or inactive (`false`) |
+|alarm | Bool| `true` or `false` | Indicates whether there is an alarm state. If `true`, the siren is in alarm. `false` otherwise. |
 </li>
 <li>
-To activate the alarm just send the request `http://<CARD_IP>/1/on`
+To activate the alarm just send the request to http://CARD_IP/1/on
 
 | Key | Type | Values | Description |
 |---|---|---|---|
-|result| Bool | `true` or `false` |  |
-|msg | String | - | Result message  |
+|result| Bool | `true` or `false` | If `true`, the alarm is active. If `false`, the alarm is not active. |
+|msg | String | - | A message written in natural language useful to describe the `result` key.  |
 </li>
 <li>
-To deactivate the alarm just send the request `http://<CARD_IP>/1/off`
+To deactivate the alarm just send the request to http://CARD_IP/1/off
 
 | Key | Type | Values | Description |
 |---|---|---|---|
-|result| Bool | `true` or `false` |  |
-|msg | String | - | Result message  |
+|result| Bool | `true` or `false` | If `true`, the alarm is active. If `false`, the alarm is not active. |
+|msg | String | - | A message written in natural language useful to describe the `result` key.  |
 </li>
 </ol>
 
