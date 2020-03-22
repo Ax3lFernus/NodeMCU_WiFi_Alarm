@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1.3 21-03-2020
+ * Version v2.1.4 22-03-2020
  */
 
 // Load Wi-Fi library
@@ -119,12 +119,20 @@ void loop()
             if (header.indexOf("GET /1/on") >= 0)
             {
               setAlarm(true);
-              client.println("{\"result\":true,\"msg\":\"Alarm activated\"}");
+              client.print("{\"result\":");
+              if (!alarmActive)
+              {
+                client.print("false,\"msg\":\"Error. Check the tamper line.\"}");
+              }
+              else
+              {
+                client.print("true,\"msg\":\"Alarm activated\"}");
+              }
             }
             else if (header.indexOf("GET /1/off") >= 0)
             {
               setAlarm(false);
-              client.println("{\"result\":true,\"msg\":\"Alarm deactivated\"}");
+              client.print("{\"result\":true,\"msg\":\"Alarm deactivated\"}");
             }
             else if (header.indexOf("GET /status") >= 0)
             {
@@ -189,31 +197,14 @@ void rfidCardScanner()
   if (content.substring(1) == UID) //change UID of the card that you want to give access
   {
     Serial.println(" Access Granted ");
-    if (digitalRead(h24Pin) == HIGH && alarmActive == false && inAlarm == false)
-    { // If h24Pin is open, send acustic feedback via siren
-      digitalWrite(siren, LOW);
-      delay(500);
-      digitalWrite(siren, HIGH);
-      delay(500);
-      digitalWrite(siren, LOW);
-      delay(500);
-      digitalWrite(siren, HIGH);
-      delay(500);
-      digitalWrite(siren, LOW);
-      delay(500);
+    if (inAlarm == true)
+    {
+      setAlarm(false);
       digitalWrite(siren, HIGH);
     }
     else
-    {
-      if (inAlarm == true)
-      {
-        setAlarm(false);
-        digitalWrite(siren, HIGH);
-      }
-      else
-        setAlarm(!alarmActive);
-      delay(1000);
-    }
+      setAlarm(!alarmActive);
+    delay(1000);
   }
   else
   {
@@ -263,9 +254,26 @@ void setAlarm(bool value)
   doorOpened = false;
   if (value)
   { //SET ALARM TO ON (with exit time)
-    alarmActive = true;
-    digitalWrite(activeAlarmLed, HIGH);
-    doorExitPreviousTime = millis();
+    if (digitalRead(h24Pin) == HIGH)
+    { // If h24Pin is open, send acustic feedback via siren
+      digitalWrite(siren, LOW);
+      delay(500);
+      digitalWrite(siren, HIGH);
+      delay(500);
+      digitalWrite(siren, LOW);
+      delay(500);
+      digitalWrite(siren, HIGH);
+      delay(500);
+      digitalWrite(siren, LOW);
+      delay(500);
+      digitalWrite(siren, HIGH);
+    }
+    else
+    {
+      alarmActive = true;
+      digitalWrite(activeAlarmLed, HIGH);
+      doorExitPreviousTime = millis();
+    }
   }
   else
   { //SET ALARM TO OFF
