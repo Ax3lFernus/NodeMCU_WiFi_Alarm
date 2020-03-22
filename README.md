@@ -20,16 +20,42 @@ A simple firmware that makes NodeMCU a Wireless alarm center.
 ## Features
 ### RC522 Support
 With the RFID-RC522 card it is possible to activate and deactivate the alarm via an RFID tag or card.
-<img src="./docs/images/rfid_card.jpg" alt="RFID Card" width=40%>&nbsp;<img src="./docs/images/rfid_tag.jpg" alt="RFID Tag" width="53.5%">
+<img src="./docs/images/rfid_card.jpg" alt="RFID Card" width=40%>&nbsp;<img src="./docs/images/rfid_tag.jpg" alt="RFID Tag" width="50%">
 ### Wireless Connectivity
 The NodeMCU card was born to have an integrated WiFi NIC. This functionality is used to check the card to read its status through the [APIs](#apis).
 ### APIs
 The APIs provide commands to check and modify the alarm status. 
 It is necessary to know the local IP of the card in order to interact with it through HTTP GET requests, the answers are in json format.
 Here is the list of possible requests:
-1. To know the status of the card just send the request `http://<CARD_IP>/status`
-2. To activate the alarm just send the request `http://<CARD_IP>/1/on`
-3. To deactivate the alarm just send the request `http://<CARD_IP>/1/off`
+<ol>
+<li>
+To know the status of the card just send the request `http://<CARD_IP>/status`. The answer is formatted as 
+
+| Key | Type | Values | Description |
+|---|---|---|---|
+|door| String | `open` or `closed` |  |
+|h24 | String | `open` or `closed` |  |
+|active| Bool| `true` or `false` | |
+|alarm | Bool| `true` or `false` | |
+</li>
+<li>
+To activate the alarm just send the request `http://<CARD_IP>/1/on`
+
+| Key | Type | Values | Description |
+|---|---|---|---|
+|result| Bool | `true` or `false` |  |
+|msg | String | - | Result message  |
+</li>
+<li>
+To deactivate the alarm just send the request `http://<CARD_IP>/1/off`
+
+| Key | Type | Values | Description |
+|---|---|---|---|
+|result| Bool | `true` or `false` |  |
+|msg | String | - | Result message  |
+</li>
+</ol>
+
 ### Web Panel
 
 ## Installation
@@ -52,32 +78,53 @@ The role of each pin used in the board is described below:
 ### Flash firmware
 You can flash the firmware on the NodeMCU via the [Arduino IDE](https://www.arduino.cc/en/Main/Software).
 If you install the id for the first time you will need:
-1. Go to File -> Preferences -> Add the link http://arduino.esp8266.com/stable/package_esp8266com_index.json in "Additional Boards Manager URLs" -> Click "OK"
-2. Go to Tools -> Board -> click on "Boards Manager" -> search "esp8266" -> select leatest version -> click "Install" -> when finished click "Close"
-3. Go to Tools and check this configurations:
+<ol>
+<li>
+Go to File -> Preferences -> Add the link http://arduino.esp8266.com/stable/package_esp8266com_index.json in "Additional Boards Manager URLs" -> Click "OK"
+</li>
+<li>
+Go to Tools -> Board -> click on "Boards Manager" -> search "esp8266" -> select leatest version -> click "Install" -> when finished click "Close"
+</li>
+<li>
+Go to Tools and check this configurations:
 
-  | Name | Value |
-  |------|-------|
-  | Board| NodeMCU 1.0 (ESP-12E Module)|
-  |Upload Speed| 115200|
-  |Port|Select the COM port where the board is connected|  
+| Name | Value |
+|------|-------|
+| Board| NodeMCU 1.0 (ESP-12E Module)|
+|Upload Speed| 115200|
+|Port|Select the COM port where the board is connected| 
+</li> 
+<li>
+Go to File -> Open -> select 'firmware.ino' file from the repository directory on your pc -> when the code opens go to "Network SSID" and "Network PASSWORD" in the code and insert your network credentials between the quotes
 
-4. Go to File -> Open -> select 'firmware.ino' file from the repository directory on your pc -> when the code opens go to "Network SSID" and "Network PASSWORD" in the code and insert your network credentials between the quotes<br>
 `// Network and UID Credentials`<br>
 `const char *ssid = "<YOUR WIFI NAME HERE>";          //Network SSID`<br>
+
 `const char *password = "<YOUR WIFI PASSWORD HERE>"; //Network PASSWORD`<br>
+
 `const char *UID = "<UID CARD HERE>";                //UID Card Code`<br>
-5. In "UID Card Code" enter the code of your card for enable/disable the alarm.
-6. Click on the arrow pointing to the right to flash the card.
-7. That's all!
+</li>
+<li>
+In "UID Card Code" enter the code of your card for enable/disable the alarm.
+</li>
+<li>
+Click on the arrow pointing to the right to flash the card.
+</li>
+<li>
+That's all!
+</li>
+</ol>
 
 **:information_source: Note:** if you don't know the uid of your card you will need to: flash the card -> open the serial monitor (select the value 115200 as baud rate) -> scan the RFID card -> copy the UID that comes out in the monitor -> go to step 5.
+
 ### Change the timers
+
 ### Install Web Panel
 The web panel doesn't require installation so you can open `./webServer/index.html` with a browser without using additional programs. The only step is to open the `index.html` with a text editor (es. Notepad++) and insert the ip of the card in the local network in the field `nodemcu_ip`:<br>
 `let nodemcu_ip = "<NODEMCU IP HERE>" //Set your NodeMCU IP ex: 192.168.1.1`<br>
-However, you can upload the `index.html` to a web server to be able to visit it from other devices on the same local network.<br>
-<br>
+However, you can upload the `index.html` to a web server to be able to visit it from other devices on the same local network.
+
+
 **:warning: Warning:** the panel must be started on a device connected in the same local network as the NodeMCU board.
 ## The Author
 This software was developed by Alessandro Annese.<br>
