@@ -44,7 +44,7 @@ const long timeoutTime = 2000;
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm (in milliseconds, example: 10000ms = 10s)
-const long alarmTimeout = 30000;
+const long alarmTimeout = 180000;
 
 // Door time counting
 // Previous time
@@ -52,18 +52,18 @@ unsigned long doorExitPreviousTime = 0, doorEnterPreviousTime = 0;
 // Defines the entry time since the door is opened (in milliseconds, example: 10000ms = 10s)
 const long doorEnterTimeout = 10000;
 // Defines the exit time since the alarm is set to active (in milliseconds)
-const long doorExitTimeout = 5000;
+const long doorExitTimeout = 10000;
 
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
 // Time that allows the tamper line to be opened when the alarm is deactivated (in milliseconds, example: 10000ms = 10s)
-const long tamperTimeout = 20000;
+const long tamperTimeout = 10000;
 
 // Board Pin setup
 const int doorPin = D1, sirenPin = D0, h24Pin = D2, activeAlarmPin = D8;
 
 // Define flags
-bool alarmActive = false, inAlarm = false, doorOpened = false;
+bool alarmActive = false, inAlarm = false, doorOpened = false, tamperOpened = false;
 
 void setup()
 {
@@ -228,9 +228,10 @@ void alarmCheck()
 {
   // H24 Line protection
   if ((!(millis() - tamperPreviousTime <= tamperTimeout)))
-    if (digitalRead(h24Pin) == HIGH)
+    if (digitalRead(h24Pin) == HIGH && tamperOpened == false)
     {
       inAlarm = true;
+      tamperOpened = true;
     }
 
   // Alarm active control
@@ -259,6 +260,7 @@ void alarmCheck()
 void setAlarm(bool value)
 {
   doorOpened = false;
+  tamperOpened = false;
   if (value)
   { //SET ALARM TO ON (with exit time)
     if (digitalRead(h24Pin) == HIGH)
@@ -309,7 +311,7 @@ void sirenCheck()
     }
     else
     {
-      setAlarm(false);
+      //setAlarm(false);
       digitalWrite(sirenPin, HIGH);
     }
   }
