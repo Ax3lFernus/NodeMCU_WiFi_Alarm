@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1.5 22-03-2020
+ * Version v2.1.5 23-03-2020
  */
 
 // Load Wi-Fi library
@@ -44,7 +44,7 @@ const long timeoutTime = 2000;
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm (in milliseconds, example: 10000ms = 10s)
-const long alarmTimeout = 5000;
+const long alarmTimeout = 30000;
 
 // Door time counting
 // Previous time
@@ -52,15 +52,15 @@ unsigned long doorExitPreviousTime = 0, doorEnterPreviousTime = 0;
 // Defines the entry time since the door is opened (in milliseconds, example: 10000ms = 10s)
 const long doorEnterTimeout = 10000;
 // Defines the exit time since the alarm is set to active (in milliseconds)
-const long doorExitTimeout = 10000;
+const long doorExitTimeout = 5000;
 
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
 // Time that allows the tamper line to be opened when the alarm is deactivated (in milliseconds, example: 10000ms = 10s)
-const long tamperTimeout = 10000;
+const long tamperTimeout = 20000;
 
 // Board Pin setup
-const int doorPin = D1, siren = D0, h24Pin = D2, activeAlarmLed = D8;
+const int doorPin = D1, sirenPin = D0, h24Pin = D2, activeAlarmPin = D8;
 
 // Define flags
 bool alarmActive = false, inAlarm = false, doorOpened = false;
@@ -69,10 +69,10 @@ void setup()
 {
   pinMode(doorPin, INPUT_PULLUP);
   pinMode(h24Pin, INPUT_PULLUP);
-  pinMode(siren, OUTPUT);
-  pinMode(activeAlarmLed, OUTPUT);
-  digitalWrite(siren, LOW);
-  digitalWrite(siren, HIGH);
+  pinMode(sirenPin, OUTPUT);
+  pinMode(activeAlarmPin, OUTPUT);
+  digitalWrite(sirenPin, HIGH);
+  digitalWrite(activeAlarmPin, LOW);
 
   Serial.begin(115200);
   WiFi.begin(ssid, password);
@@ -206,7 +206,7 @@ void rfidCardScanner()
     if (inAlarm == true)
     {
       setAlarm(false);
-      digitalWrite(siren, HIGH);
+      digitalWrite(sirenPin, HIGH);
     }
     else
       setAlarm(!alarmActive);
@@ -263,23 +263,23 @@ void setAlarm(bool value)
   { //SET ALARM TO ON (with exit time)
     if (digitalRead(h24Pin) == HIGH)
     { // If h24Pin is open, send acustic feedback via siren
-      digitalWrite(siren, LOW);
+      digitalWrite(sirenPin, LOW);
       delay(500);
-      digitalWrite(siren, HIGH);
+      digitalWrite(sirenPin, HIGH);
       delay(500);
-      digitalWrite(siren, LOW);
+      digitalWrite(sirenPin, LOW);
       delay(500);
-      digitalWrite(siren, HIGH);
+      digitalWrite(sirenPin, HIGH);
       delay(500);
-      digitalWrite(siren, LOW);
+      digitalWrite(sirenPin, LOW);
       delay(500);
-      digitalWrite(siren, HIGH);
+      digitalWrite(sirenPin, HIGH);
     }
     else
     {
       alarmActive = true;
       tamperPreviousTime = 0;
-      digitalWrite(activeAlarmLed, HIGH);
+      digitalWrite(activeAlarmPin, HIGH);
       doorExitPreviousTime = millis();
     }
   }
@@ -287,7 +287,7 @@ void setAlarm(bool value)
   { //SET ALARM TO OFF
     inAlarm = false;
     alarmActive = false;
-    digitalWrite(activeAlarmLed, LOW);
+    digitalWrite(activeAlarmPin, LOW);
     tamperPreviousTime = millis();
   }
 }
@@ -305,17 +305,17 @@ void sirenCheck()
     //Alarm time counting
     if (millis() - alarmPreviousTime <= alarmTimeout)
     {
-      digitalWrite(siren, LOW);
+      digitalWrite(sirenPin, LOW);
     }
     else
     {
       setAlarm(false);
-      digitalWrite(siren, HIGH);
+      digitalWrite(sirenPin, HIGH);
     }
   }
   else
   {
     alarmPreviousTime = millis();
-    digitalWrite(siren, HIGH);
+    digitalWrite(sirenPin, HIGH);
   }
 }
