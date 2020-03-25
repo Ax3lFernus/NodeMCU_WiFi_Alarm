@@ -80,7 +80,10 @@ void setup()
   {
     delay(500);
   }
-  Serial.println("Connected. Alarm ready.");
+  Serial.println("Connected.");
+  Serial.print("IP address: ");
+  Serial.print(WiFi.localIP());
+  Serial.println(" Alarm ready.");
   server.begin();
   SPI.begin();        // Initiate  SPI bus
   mfrc522.PCD_Init(); // Initiate MFRC522
