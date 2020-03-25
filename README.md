@@ -80,7 +80,7 @@ You can flash the firmware on the NodeMCU via the [Arduino IDE](https://www.ardu
 If you install the id for the first time you will need:
 <ol>
 <li>
-Go to File -> Preferences -> Add the link http://arduino.esp8266.com/stable/package_esp8266com_index.json in "Additional Boards Manager URLs" -> Click "OK"
+Go to File -> Preferences -> add the link http://arduino.esp8266.com/stable/package_esp8266com_index.json in "Additional Boards Manager URLs" -> Click "OK"
 </li>
 <li>
 Go to Tools -> Board -> click on "Boards Manager" -> search "esp8266" -> select leatest version -> click "Install" -> when finished click "Close"
@@ -94,6 +94,9 @@ Go to Tools and check this configurations:
 |Upload Speed| 115200|
 |Port|Select the COM port where the board is connected| 
 </li> 
+<li>
+Download the <a href="https://github.com/miguelbalboa/rfid/releases/latest/">source code</a> of the RFID library -> open Arduino IDE and go to Sketch -> Include Library -> Add .ZIP Library... -> select the previously downloaded .zip file -> click Open.
+</li>
 <li>
 Go to File -> Open -> select 'firmware.ino' file from the repository directory on your pc -> when the code opens go to "Network SSID" and "Network PASSWORD" in the code and insert your network credentials between the quotes
 
@@ -118,6 +121,28 @@ That's all!
 **:information_source: Note:** if you don't know the uid of your card you will need to: flash the card -> open the serial monitor (select the value 115200 as baud rate) -> scan the RFID card -> copy the UID that comes out in the monitor -> go to step 5.
 
 ### Change the timers
+The alarm has times that can be changed at will:
+- Exit time (from when the alarm is activated until the door is detected open)
+- Entry time (from when the door is opened to the sound of the siren)
+- Alarm time
+- Tamper detection time (from when the alarm is deactivated until the open tamper is detected)
+
+Times are expressed in milliseconds. Ex: for 10 seconds we will have to enter the value 10000. 
+
+So `milliseconds = seconds * 1000`.
+
+You can change the value of timers by finding the respective variables in the code:
+
+`// Define siren sound time in case of alarm (in milliseconds, example: 10000ms = 10s)`<br>
+`const long alarmTimeout = 180000;`
+
+This line expresses the alarm time. To change it to 10 seconds just change the variable:
+
+`const long alarmTimeout = 10000;`
+
+This applies to all timers.
+
+**:warning: Danger zone:** It isn't recommended to change the `timeoutTime` variable as it is reserved for the Web server.
 
 ### Install Web Panel
 The web panel doesn't require installation so you can open `./webServer/index.html` with a browser without using additional programs. The only step is to open the `index.html` with a text editor (es. Notepad++) and insert the ip of the card in the local network in the field `nodemcu_ip`:<br>
