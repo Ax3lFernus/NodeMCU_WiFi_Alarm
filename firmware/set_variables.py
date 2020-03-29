@@ -12,7 +12,7 @@
 # Developed by Alessandro Annese
 # GitHub: Ax3lFernus
 # E-Mail: a.annese99@gmail.com
-# Version v1.3.1 29-03-2020
+# Version v1.4 29-03-2020
 #
 import string
 import secrets
@@ -105,10 +105,10 @@ def setTimers(data):
         tamperTime = int(tamperTime)
     except ValueError:
         tamperTime = 180
-    data[50] = "const long alarmTimeout = " + alarmTime * 1000 + ";"
-    data[56] = "const long doorEnterTimeout = " + doorEnter * 1000 + ";"
-    data[58] = "const long doorExitTimeout = " + doorExit * 1000 + ";"
-    data[63] = "const long tamperTimeout = " + tamperTime * 1000 + ";"
+    data[50] = "const long alarmTimeout = " + str(alarmTime * 1000) + ";\n"
+    data[56] = "const long doorEnterTimeout = " + str(doorEnter * 1000) + ";\n"
+    data[58] = "const long doorExitTimeout = " + str(doorExit * 1000) + ";\n"
+    data[63] = "const long tamperTimeout = " + str(tamperTime * 1000) + ";\n"
 
 if __name__ == "__main__":
     print("Opening file...")
@@ -127,7 +127,9 @@ if __name__ == "__main__":
         if choice == 1:
             setWiFi(data)
             setUID(data)
+            setTimers(data)
             generateApiKey(data)
+            setCertificates(data)
         elif choice == 2:
             setWiFi(data)
         elif choice == 3:

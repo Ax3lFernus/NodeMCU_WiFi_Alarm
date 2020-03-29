@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.3 29-03-2020
+ * Version v2.3.1 29-03-2020
  */
 
 // Load Wi-Fi library
@@ -47,20 +47,20 @@ unsigned long currentTime = millis();
 
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
-// Define siren sound time in case of alarm (in milliseconds, example: 10000ms = 10s)
+// Define siren sound time in case of alarm
 const long alarmTimeout = 180000;
 
 // Door time counting
 // Previous time
 unsigned long doorExitPreviousTime = 0, doorEnterPreviousTime = 0;
-// Defines the entry time since the door is opened (in milliseconds, example: 10000ms = 10s)
+// Defines the entry time since the door is opened
 const long doorEnterTimeout = 10000;
-// Defines the exit time since the alarm is set to active (in milliseconds)
+// Defines the exit time since the alarm is set to active
 const long doorExitTimeout = 10000;
 
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
-// Time that allows the tamper line to be opened when the alarm is deactivated (in milliseconds, example: 10000ms = 10s)
+// Time that allows the tamper line to be opened when the alarm is deactivated
 const long tamperTimeout = 10000;
 
 // Board Pin setup
