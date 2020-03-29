@@ -15,15 +15,17 @@ Version v1.0.1 21-03-2020
 --->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Alarm Web Panel</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/636c256db6.js" crossorigin="anonymous"></script>
-	<script>
-		let nodemcu_ip = "" //Set your NodeMCU IP ex: 192.168.1.1
-	</script>
+    <script>
+        let nodemcu_url = "" //Set your NodeMCU URL ex: https://192.168.1.1
+        let api_key = ""     //Insert generated api key
+    </script>
     <style>
         html {
             font-size: 1rem;
@@ -54,129 +56,135 @@ Version v1.0.1 21-03-2020
         }
     </style>
 </head>
+
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h1>Alarm Status <span id="badge_active" style="display: none;"
-                                   class="badge badge-success"><i class="fas fa-check"></i> Active</span><span id="badge_disabled"
-                                                                                  style="display: none;"
-                                                                                  class="badge badge-secondary"><i class="fas fa-times"></i> Disabled</span>
-                <span id="badge_loading" class="badge badge-info"><i class="fas fa-compass"></i> Loading...</span><span id="badge_alarm"
-                                                                                         style="display: none;"
-                                                                                         class="badge badge-danger"><i class="fas fa-bell"></i> Alarm!</span>
-            </h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div id="alert_loading" style="display: none;" class="alert alert-info" role="alert">
-                <i class="fas fa-rocket"></i> Sending command to alarm...
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Alarm Status <span id="badge_active" style="display: none;" class="badge badge-success"><i
+                            class="fas fa-check"></i> Active</span><span id="badge_disabled" style="display: none;"
+                        class="badge badge-secondary"><i class="fas fa-times"></i> Disabled</span>
+                    <span id="badge_loading" class="badge badge-info"><i class="fas fa-compass"></i>
+                        Loading...</span><span id="badge_alarm" style="display: none;" class="badge badge-danger"><i
+                            class="fas fa-bell"></i> Alarm!</span>
+                </h1>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <button id="disableButton" type="button" class="btn btn-secondary btn-lg btn-block" data-toggle="modal"
+        <div class="row">
+            <div class="col">
+                <div id="alert_loading" style="display: none;" class="alert alert-info" role="alert">
+                    <i class="fas fa-rocket"></i> Sending command to alarm...
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button id="disableButton" type="button" class="btn btn-secondary btn-lg btn-block" data-toggle="modal"
                     data-target="#disableModal" disabled>
-                <i class="fas fa-times"></i> Disable
-            </button>
-        </div>
-        <div class="col">
-            <button id="enableButton" type="button" class="btn btn-success btn-lg btn-block" data-toggle="modal"
+                    <i class="fas fa-times"></i> Disable
+                </button>
+            </div>
+            <div class="col">
+                <button id="enableButton" type="button" class="btn btn-success btn-lg btn-block" data-toggle="modal"
                     data-target="#enableModal" disabled>
-                <i class="fas fa-check"></i> Enable
-            </button>
-        </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col">
-            <h1>Areas Status</h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <table class="table table-bordered">
-                <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Status</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Door</td>
-                    <td>
-                        <p id="door_open" style="display:none;" class="text text-warning font-weight-bold">Open</p>
-                        <p id="door_close" style="display:none;" class="text text-success font-weight-bold">Close</p>
-                        <p id="door_loading" class="text text-secondary font-weight-bold">Loading...</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Tamper Line</td>
-                    <td>
-                        <p id="tamper_open" style="display:none;" class="text text-warning font-weight-bold">Open</p>
-                        <p id="tamper_close" style="display:none;" class="text text-success font-weight-bold">Close</p>
-                        <p id="tamper_loading" class="text text-secondary font-weight-bold">Loading...</p>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <p class="text text-center">
-                Developed by Alessandro Annese
-                <br>
-                <a class="mr-2" href="https://github.com/Ax3lFernus/" target="_blank"><i class="fab fa-github"></i></a>
-                <a class="mr-2" href="https://www.linkedin.com/in/alessandro-annese-79683913b/" target="_blank"><i class="fab fa-linkedin"></i></a>
-                <a href="mailto:a.annese99@gmail.com"><i class="fas fa-envelope"></i></a>
-            </p>
-        </div>
-    </div>
-</div>
-<!-- Active Modal -->
-<div class="modal fade" id="enableModal" tabindex="-1" role="dialog"
-     aria-labelledby="enableModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="enableModalLabel">Are you sure you want to activate the alarm?</h5>
-            </div>
-            <div class="modal-footer text-center">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <button type="button" class="btn btn-primary" onclick="setAlarm('on')" data-dismiss="modal">Yes</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
-<div class="modal fade" id="disableModal" tabindex="-1" role="dialog"
-     aria-labelledby="disableModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="disableModalLabel">Are you sure you want to deactivate the alarm?</h5>
-            </div>
-            <div class="modal-footer text-center">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <button type="button" class="btn btn-primary" onclick="setAlarm('off')" data-dismiss="modal">Yes
+                    <i class="fas fa-check"></i> Enable
                 </button>
             </div>
         </div>
+        <div class="row mt-3">
+            <div class="col">
+                <h1>Areas Status</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Door</td>
+                            <td>
+                                <p id="door_open" style="display:none;" class="text text-warning font-weight-bold">Open
+                                </p>
+                                <p id="door_close" style="display:none;" class="text text-success font-weight-bold">
+                                    Close</p>
+                                <p id="door_loading" class="text text-secondary font-weight-bold">Loading...</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tamper Line</td>
+                            <td>
+                                <p id="tamper_open" style="display:none;" class="text text-warning font-weight-bold">
+                                    Open</p>
+                                <p id="tamper_close" style="display:none;" class="text text-success font-weight-bold">
+                                    Close</p>
+                                <p id="tamper_loading" class="text text-secondary font-weight-bold">Loading...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p class="text text-center">
+                    Developed by Alessandro Annese
+                    <br>
+                    <a class="mr-2" href="https://github.com/Ax3lFernus/" target="_blank"><i
+                            class="fab fa-github"></i></a>
+                    <a class="mr-2" href="https://www.linkedin.com/in/alessandro-annese-79683913b/" target="_blank"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="mailto:a.annese99@gmail.com"><i class="fas fa-envelope"></i></a>
+                </p>
+            </div>
+        </div>
     </div>
-</div>
+    <!-- Active Modal -->
+    <div class="modal fade" id="enableModal" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="enableModalLabel">Are you sure you want to activate the alarm?</h5>
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary" onclick="setAlarm('on')"
+                        data-dismiss="modal">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="disableModal" tabindex="-1" role="dialog" aria-labelledby="disableModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="disableModalLabel">Are you sure you want to deactivate the alarm?</h5>
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary" onclick="setAlarm('off')" data-dismiss="modal">Yes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-        crossorigin="anonymous"></script>
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
 <script>
     let checkId, checkAlarmStatus, onLoad = true, previousState = false;
     $(document).ready(function () {
@@ -186,11 +194,16 @@ Version v1.0.1 21-03-2020
     function check() {
         checkAlarmStatus = $.ajax({
             cache: false,
-            timeout: 2000,
-            type: "GET",
-            url: "http://" + nodemcu_ip + "/status",
+            timeout: 3000,
+            method: "POST",
+            url: nodemcu_url,
+            data: {
+                'key': api_key,
+                'operation': 'status'
+            },
             dataType: 'json',
             error: function (error) {
+                console.log(error);
             },
             success: function (data) {
                 $('#json').text(JSON.stringify(data));
@@ -237,13 +250,13 @@ Version v1.0.1 21-03-2020
                 }
 
                 if (onLoad) {
-                    checkId = setInterval(check, data.active === true ? 5000 : 1000);
+                    checkId = setInterval(check, data.active === true ? 5000 : 3000);
                     onLoad = false;
                     previousState = data.active;
                 } else if (previousState !== data.active) {
                     clearInterval(checkId);
                     checkAlarmStatus.abort();
-                    checkId = setInterval(check, data.active === true ? 5000 : 1000);
+                    checkId = setInterval(check, data.active === true ? 5000 : 3000);
                     previousState = !previousState;
                 }
             }
@@ -263,8 +276,12 @@ Version v1.0.1 21-03-2020
         setTimeout(() =>
             $.ajax({
                 cache: false,
-                type: "GET",
-                url: "http://" + nodemcu_ip +"/1/" + value,
+                method: "POST",
+                url: nodemcu_url,
+                data: {
+                    'key': api_key,
+                    'operation': value
+                },
                 dataType: 'json',
                 error: function (error) {
                     console.log(error);
@@ -273,7 +290,8 @@ Version v1.0.1 21-03-2020
                     check();
                     onLoad = true;
                 }
-            }), 1000);
+            }), 3000);
     };
 </script>
+
 </html>

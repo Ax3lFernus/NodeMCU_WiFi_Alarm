@@ -39,29 +39,23 @@ const char *dname = "allarme.local"; //Local address
 BearSSL::ESP8266WebServerSecure server(443);
 ESP8266WebServer serverHTTP(80);
 
-// Variable to store the HTTP request
-String header;
-
-// Current time
-unsigned long currentTime = millis();
-
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm
-const long alarmTimeout = 180000;
+const long alarmTimeout = 10000;
 
 // Door time counting
 // Previous time
 unsigned long doorExitPreviousTime = 0, doorEnterPreviousTime = 0;
 // Defines the entry time since the door is opened
-const long doorEnterTimeout = 10000;
+const long doorEnterTimeout = 20000;
 // Defines the exit time since the alarm is set to active
-const long doorExitTimeout = 10000;
+const long doorExitTimeout = 5000;
 
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
 // Time that allows the tamper line to be opened when the alarm is deactivated
-const long tamperTimeout = 10000;
+const long tamperTimeout = 180000;
 
 // Board Pin setup
 const int doorPin = D1, sirenPin = D0, h24Pin = D2, activeAlarmPin = D8;
@@ -146,7 +140,7 @@ void showWebpage()
         content += inAlarm ? "true" : "false";
         content += "}";
       }
-
+      server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "application/json", content);
     }
   }
