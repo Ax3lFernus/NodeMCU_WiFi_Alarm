@@ -74,13 +74,10 @@ const int doorPin = D1, sirenPin = D0, h24Pin = D2, activeAlarmPin = D8;
 bool alarmActive = false, inAlarm = false, doorOpened = false, tamperOpened = false;
 
 // Server certificate
-static const char serverCert[] PROGMEM = R"EOF(
------BEGIN CERTIFICATE-----
-)EOF";
+
 
 // Server private key
-static const char serverKey[] PROGMEM = R"EOF(
-)EOF";
+
 
 bool connectToWifi()
 {

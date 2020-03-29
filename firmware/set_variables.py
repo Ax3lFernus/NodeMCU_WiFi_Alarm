@@ -53,14 +53,33 @@ def generateApiKey(data):
     print("Warning: Keep it with care otherwise you will not be able to interact with the APIs.")
     input("Click ENTER to continue...")
 
+def setCertificates(data):
+    certificate_path = input("Insert certificate path: ")
+    with open(certificate_path, 'r') as file:
+        certificate = file.read()
+        file.close()
+    key_path = input("Insert key path: ")
+    with open(key_path, 'r') as file:
+        key = file.read()
+        file.close()
+    index = 0
+    while(not "bool connectToWifi()" in data[index]):
+        if "static const char server" in data[index]:
+            while not ")EOF\";" in data[index]:
+                del data[index]
+        index = index + 1
+
+    data[76] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + certificate + ")EOF\";\n"
+    data[79] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + key + ")EOF\";\n"
+
 if __name__ == "__main__":
     print("Opening file...")
     data = openFile()
     choice = -1
-    while not -1 < choice < 5:
+    while not -1 < choice < 6:
         clearConsole()
         print("NodeMCU Alarm - Script for set firmware variables")
-        print("Select a choice: \n  1 - Set all variables\n  2 - Set Wi-Fi\n  3 - Set RFID UID\n  4 - Generate API KEY\n  0 - Save and Exit")
+        print("Select a choice: \n  1 - Set all variables\n  2 - Set Wi-Fi\n  3 - Set RFID UID\n  4 - Generate API KEY\n  5 - Certificate set\n  0 - Save and Exit")
         choice = input("Choice: ")
         try:
             choice = int(choice)
@@ -77,6 +96,8 @@ if __name__ == "__main__":
             setUID(data)
         elif choice == 4:
             generateApiKey(data)
+        elif choice == 5:
+            setCertificates(data)
         
         if not choice == 0:
             choice = -1
