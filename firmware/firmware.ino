@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.1.6 25-03-2020
+ * Version v2.2 29-03-2020
  */
 
 // Load Wi-Fi library
@@ -27,6 +27,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 const char *ssid = "";     //Network SSID
 const char *password = ""; //Network PASSWORD
 const char *UID = "";      //UID Card Code
+const char *API_KEY = "";  //API KEY
 
 // Set WebServer Port to 80
 WiFiServer server(80);
@@ -75,6 +76,28 @@ void setup()
   digitalWrite(activeAlarmPin, LOW);
 
   Serial.begin(115200);
+  if (API_KEY == "")
+  {
+    Serial.println("\nERROR: There is no API KEY. Please enter one.");
+    while (true)
+    {
+      digitalWrite(activeAlarmPin, HIGH);
+      delay(500);
+      digitalWrite(activeAlarmPin, LOW);
+      delay(500);
+    };
+  }
+  if (ssid == "" || password == "")
+  {
+    Serial.println("\nERROR: There is no Wi-Fi SSID or Password. Please enter one.");
+    while (true)
+    {
+      digitalWrite(activeAlarmPin, HIGH);
+      delay(500);
+      digitalWrite(activeAlarmPin, LOW);
+      delay(500);
+    };
+  }
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
