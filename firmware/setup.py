@@ -77,9 +77,9 @@ def setCertificates(data):
                 del data[index]
         index = index + 1
 
-    data[72] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
+    data[66] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
                                                                 certificate + ")EOF\";\n"
-    data[75] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
+    data[69] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
                                                                key + ")EOF\";\n"
 
 
@@ -105,10 +105,10 @@ def setTimers(data):
         tamperTime = int(tamperTime)
     except ValueError:
         tamperTime = 180
-    data[50] = "const long alarmTimeout = " + str(alarmTime * 1000) + ";\n"
-    data[56] = "const long doorEnterTimeout = " + str(doorEnter * 1000) + ";\n"
-    data[58] = "const long doorExitTimeout = " + str(doorExit * 1000) + ";\n"
-    data[63] = "const long tamperTimeout = " + str(tamperTime * 1000) + ";\n"
+    data[44] = "const long alarmTimeout = " + str(alarmTime * 1000) + ";\n"
+    data[50] = "const long doorEnterTimeout = " + str(doorEnter * 1000) + ";\n"
+    data[52] = "const long doorExitTimeout = " + str(doorExit * 1000) + ";\n"
+    data[57] = "const long tamperTimeout = " + str(tamperTime * 1000) + ";\n"
 
 if __name__ == "__main__":
     print("Opening file...")
