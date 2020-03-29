@@ -38,17 +38,17 @@ def saveFile(data):
 def setWiFi(data):
     ssid = input("Insert your Wi-Fi SSID: ")
     pw = input("Insert your Wi-Fi password: ")
-    data[26] = "const char *ssid = \"" + ssid.strip() + "\"; //Network SSID\n"
-    data[27] = "const char *password = \"" + \
+    data[30] = "const char *ssid = \"" + ssid.strip() + "\"; //Network SSID\n"
+    data[31] = "const char *password = \"" + \
         pw.strip() + "\"; //Network PASSWORD\n"
 
 def setUID(data):
     uid = input("Insert your UID card: ")
-    data[28] = "const char *UID = \"" + uid.strip() + "\"; //UID Card Code\n"
+    data[32] = "const char *UID = \"" + uid.strip() + "\"; //UID Card Code\n"
 
 def generateApiKey(data):
     api_key = secrets.token_urlsafe(32)
-    data[29] = "const char *API_KEY = \"" + api_key + "\"; //API KEY\n"
+    data[33] = "const char *API_KEY = \"" + api_key + "\"; //API KEY\n"
     print("Your api key is: " + api_key)
     print("Warning: Keep it with care otherwise you will not be able to interact with the APIs.")
     input("Click ENTER to continue...")
