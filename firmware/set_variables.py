@@ -77,9 +77,9 @@ def setCertificates(data):
                 del data[index]
         index = index + 1
 
-    data[76] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
+    data[72] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
                                                                 certificate + ")EOF\";\n"
-    data[79] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
+    data[75] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
                                                                key + ")EOF\";\n"
 
 
