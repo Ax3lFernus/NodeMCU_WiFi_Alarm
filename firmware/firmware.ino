@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.2.1 29-03-2020
+ * Version v2.2 29-03-2020
  */
 
 // Load Wi-Fi library
@@ -76,7 +76,7 @@ void setup()
   digitalWrite(activeAlarmPin, LOW);
 
   Serial.begin(115200);
-  if (API_KEY == "" && (ssid == "" || password == ""))
+  if (API_KEY == "" && ssid == "")
   {
     Serial.println("\nERROR: Missing variables.");
     while (true)
