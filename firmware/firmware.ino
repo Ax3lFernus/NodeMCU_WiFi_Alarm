@@ -44,10 +44,6 @@ String header;
 
 // Current time
 unsigned long currentTime = millis();
-// Previous time
-unsigned long previousTime = 0;
-// Define timeout time in milliseconds (example: 2000ms = 2s)
-const long timeoutTime = 2000;
 
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;

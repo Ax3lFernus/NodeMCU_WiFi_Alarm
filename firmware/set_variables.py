@@ -14,14 +14,17 @@
 # E-Mail: a.annese99@gmail.com
 # Version v1.3.1 29-03-2020
 #
-import string, secrets
+import string
+import secrets
 from os import system, name
 
-def clearConsole(): 
-    if name == 'nt': 
-        _ = system('cls')  
-    else: 
-        _ = system('clear') 
+
+def clearConsole():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
+
 
 def openFile():
     with open('firmware.ino', 'r') as file:
@@ -30,10 +33,12 @@ def openFile():
         file.close()
     return data
 
+
 def saveFile(data):
     with open('firmware.ino', 'w') as file:
         file.writelines(data)
         file.close()
+
 
 def setWiFi(data):
     ssid = input("Insert your Wi-Fi SSID: ")
@@ -42,16 +47,19 @@ def setWiFi(data):
     data[31] = "const char *password = \"" + \
         pw.strip() + "\"; //Network PASSWORD\n"
 
+
 def setUID(data):
     uid = input("Insert your UID card: ")
     data[32] = "const char *UID = \"" + uid.strip() + "\"; //UID Card Code\n"
+
 
 def generateApiKey(data):
     api_key = secrets.token_urlsafe(32)
     data[33] = "const char *API_KEY = \"" + api_key + "\"; //API KEY\n"
     print("Your api key is: " + api_key)
-    print("Warning: Keep it with care otherwise you will not be able to interact with the APIs.")
+    print("\nWarning: Keep it with care otherwise you will not be able to interact with the APIs.")
     input("Click ENTER to continue...")
+
 
 def setCertificates(data):
     certificate_path = input("Insert certificate path: ")
@@ -69,17 +77,47 @@ def setCertificates(data):
                 del data[index]
         index = index + 1
 
-    data[76] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + certificate + ")EOF\";\n"
-    data[79] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + key + ")EOF\";\n"
+    data[76] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
+                                                                certificate + ")EOF\";\n"
+    data[79] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
+                                                               key + ")EOF\";\n"
+
+
+def setTimers(data):
+    print("For each timer, if left empty, the default value will be set.\nEach input is to be entered in seconds.")
+    alarmTime = input("Insert alarm time (180): ")
+    try:
+        alarmTime = int(alarmTime)
+    except ValueError:
+        alarmTime = 180
+    doorEnter = input("Insert door enter time (10): ")
+    try:
+        doorEnter = int(doorEnter)
+    except ValueError:
+        doorEnter = 10
+    doorExit = input("Insert door exit time (10): ")
+    try:
+        doorExit = int(doorExit)
+    except ValueError:
+        doorExit = 10
+    tamperTime = input("Insert tamper time (180): ")
+    try:
+        tamperTime = int(tamperTime)
+    except ValueError:
+        tamperTime = 180
+    data[50] = "const long alarmTimeout = " + alarmTime * 1000 + ";"
+    data[56] = "const long doorEnterTimeout = " + doorEnter * 1000 + ";"
+    data[58] = "const long doorExitTimeout = " + doorExit * 1000 + ";"
+    data[63] = "const long tamperTimeout = " + tamperTime * 1000 + ";"
 
 if __name__ == "__main__":
     print("Opening file...")
     data = openFile()
     choice = -1
-    while not -1 < choice < 6:
+    while not -1 < choice < 7:
         clearConsole()
         print("NodeMCU Alarm - Script for set firmware variables")
-        print("Select a choice: \n  1 - Set all variables\n  2 - Set Wi-Fi\n  3 - Set RFID UID\n  4 - Generate API KEY\n  5 - Certificate set\n  0 - Save and Exit")
+        print("Select a choice: \n  1 - Set all variables\n  2 - Set Wi-Fi\n  3 - Set RFID UID\n  4 - Set alarm timers\n  5 - Generate API KEY\n  6 - Certificate set\n  0 - Save and Exit")
         choice = input("Choice: ")
         try:
             choice = int(choice)
@@ -95,8 +133,10 @@ if __name__ == "__main__":
         elif choice == 3:
             setUID(data)
         elif choice == 4:
-            generateApiKey(data)
+            setTimers(data)
         elif choice == 5:
+            generateApiKey(data)
+        elif choice == 6:
             setCertificates(data)
         
         if not choice == 0:
