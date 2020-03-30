@@ -29,7 +29,7 @@ static const char *UID = "";              //UID Card Code
 static const char *API_KEY = "";          //API KEY
 static const char *IFTTT_STATUS_URL = ""; //IFTTT Webhook URL for send status via Telegram
 static const char *IFTTT_ALARM_URL = "";  //IFTTT Webhook URL for send alarm alert via Telegram
-static const char *dname = "";            //IFTTT Webhook URL for send alarm alert via Telegram
+static const char *dname = "";            //Board domain address
 
 // Create MFRC522 instance
 MFRC522 mfrc522(D4, D3);
