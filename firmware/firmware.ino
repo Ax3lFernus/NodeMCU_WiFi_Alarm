@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.5 30-03-2020
+ * Version v2.5.1 30-03-2020
  */
 
 // Load Wi-Fi library
@@ -29,7 +29,7 @@ static const char *UID = "";              //UID Card Code
 static const char *API_KEY = "";          //API KEY
 static const char *IFTTT_STATUS_URL = ""; //IFTTT Webhook URL for send status via Telegram
 static const char *IFTTT_ALARM_URL = "";  //IFTTT Webhook URL for send alarm alert via Telegram
-static const char *dname = "";            //Board domain ddress
+static const char *dname = "";            //IFTTT Webhook URL for send alarm alert via Telegram
 
 // Create MFRC522 instance
 MFRC522 mfrc522(D4, D3);
@@ -41,29 +41,28 @@ HTTPClient http;
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm
-static const long alarmTimeout = 10000;
+static const long alarmTimeout = 180000;
 
 // Door time counting
 // Previous time
 unsigned long doorExitPreviousTime = 0, doorEnterPreviousTime = 0;
 // Defines the entry time since the door is opened
-static const long doorEnterTimeout = 20000;
+static const long doorEnterTimeout = 10000;
 // Defines the exit time since the alarm is set to active
-static const long doorExitTimeout = 5000;
+static const long doorExitTimeout = 10000;
 
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
 // Time that allows the tamper line to be opened when the alarm is deactivated
-static const long tamperTimeout = 1000;
+static const long tamperTimeout = 180000;
 
 // Board Pin setup
 static const int h24Pin = A0, doorPin = D1, sirenPin = D2, activeAlarmPin = D8;
 
 // Define flags
-bool alarmActive = false, inAlarm = false, doorOpened = false, tamperOpened = false;
+bool alarmActive = false, inAlarm = false, doorOpened = false, tamperOpened = false, alarmAlert = true;
 
 // Server certificate
-
 
 // Private key
 
@@ -259,9 +258,16 @@ void sirenCheck()
       //setAlarm(false);
       digitalWrite(sirenPin, LOW);
     }
+
+    if (alarmAlert)
+    {
+      alarmAlert = false;
+      sendAlarmAlert();
+    }
   }
   else
   {
+    alarmAlert = true;
     alarmPreviousTime = millis();
     digitalWrite(sirenPin, LOW);
   }
@@ -359,6 +365,19 @@ void sendAlarmStatus()
     url += "&value3=";
     url += analogRead(h24Pin) < 800 ? "Aperta" : "Chiusa";
     http.begin(IFTTT_STATUS_URL);
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    http.POST(url);
+    http.end();
+  }
+}
+
+void sendAlarmAlert()
+{
+  if (IFTTT_ALARM_URL != "")
+  {
+    String url = "value1=";
+    url += inAlarm ? "Allarme in corso" : "Nessun'allarme";
+    http.begin(IFTTT_ALARM_URL);
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     http.POST(url);
     http.end();
