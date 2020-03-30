@@ -135,7 +135,7 @@ def setAlarmURL(data):
 
 def setDomainName(data):
     url = input("Enter the domain name of the NodeMCU card: ")
-    data[31] = "static const char *dname = \"" + \
+    data[34] = "static const char *dname = \"" + \
         url.strip() + "\"; //Board domain address\n"
 
 
