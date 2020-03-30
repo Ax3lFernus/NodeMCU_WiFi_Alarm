@@ -12,7 +12,7 @@
 # Developed by Alessandro Annese
 # GitHub: Ax3lFernus
 # E-Mail: a.annese99@gmail.com
-# Version v1.4.1 30-03-2020
+# Version v1.4.2 30-03-2020
 #
 import string
 import secrets
@@ -28,7 +28,6 @@ def clearConsole():
 
 def openFile():
     with open('firmware.ino', 'r') as file:
-        # read a list of lines into data
         data = file.readlines()
         file.close()
     return data
@@ -43,21 +42,24 @@ def saveFile(data):
 def setWiFi(data):
     ssid = input("Insert your Wi-Fi SSID: ")
     pw = input("Insert your Wi-Fi Password: ")
-    data[25] = "static const char *ssid = \"" + \
+    data[27] = "static const char *ssid = \"" + \
         ssid.strip() + "\"; //Network SSID\n"
-    data[26] = "static const char *password = \"" + \
+    data[28] = "static const char *password = \"" + \
         pw.strip() + "\"; //Network PASSWORD\n"
 
 
 def setUID(data):
-    uid = input("Enter the UID of the card: ")
-    data[27] = "static const char *UID = \"" + \
-        uid.strip() + "\"; //UID Card Code\n"
+    uid = input("Enter the UID of the 1st card (empty for none): ")
+    data[29] = "static const char *UID_1 = \"" + \
+        uid.strip() + "\"; //1st UID Card Code\n"
+    uid = input("Enter the UID of the 2st card (empty for none): ")
+    data[30] = "static const char *UID_2 = \"" + \
+        uid.strip() + "\"; //2nd UID Card Code\n"
 
 
 def generateApiKey(data):
     api_key = secrets.token_urlsafe(32)
-    data[28] = "static const char *API_KEY = \"" + api_key + "\"; //API KEY\n"
+    data[31] = "static const char *API_KEY = \"" + api_key + "\"; //API KEY\n"
     print("Your api key is: " + api_key)
     print("\nWarning: Keep it with care otherwise you will not be able to interact with the APIs.")
     input("Click ENTER to continue...")
@@ -79,9 +81,9 @@ def setCertificates(data):
                 del data[index]
         index = index + 1
 
-    data[65] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
+    data[68] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
         certificate + ")EOF\";\n"
-    data[68] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
+    data[70] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
         key + ")EOF\";\n"
 
 
@@ -107,27 +109,27 @@ def setTimers(data):
         tamperTime = int(tamperTime)
     except ValueError:
         tamperTime = 180
-    data[43] = "static const long alarmTimeout = " + \
+    data[46] = "static const long alarmTimeout = " + \
         str(alarmTime * 1000) + ";\n"
-    data[49] = "static const long doorEnterTimeout = " + \
+    data[52] = "static const long doorEnterTimeout = " + \
         str(doorEnter * 1000) + ";\n"
-    data[51] = "static const long doorExitTimeout = " + \
+    data[54] = "static const long doorExitTimeout = " + \
         str(doorExit * 1000) + ";\n"
-    data[56] = "static const long tamperTimeout = " + \
+    data[59] = "static const long tamperTimeout = " + \
         str(tamperTime * 1000) + ";\n"
 
 
 def setStatusURL(data):
     url = input(
         "Enter the url to communicate with IFTTT in order to send notifications of the alarm status via telegram (without https): ")
-    data[29] = "static const char *IFTTT_STATUS_URL = \"" + \
+    data[32] = "static const char *IFTTT_STATUS_URL = \"" + \
         url.strip() + "\"; //IFTTT Webhook URL for send status via Telegram\n"
 
 
 def setAlarmURL(data):
     url = input(
         "Enter the url to communicate with IFTTT in order to send the alarm alert via telegram (without https): ")
-    data[30] = "static const char *IFTTT_ALARM_URL = \"" + \
+    data[33] = "static const char *IFTTT_ALARM_URL = \"" + \
         url.strip() + "\"; //IFTTT Webhook URL for send alarm alert via Telegram\n"
 
 
