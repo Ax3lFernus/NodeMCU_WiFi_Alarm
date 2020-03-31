@@ -12,7 +12,7 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.6 30-03-2020
+ * Version v2.6.1 31-03-2020
  */
 
 // Load Wi-Fi library
@@ -44,7 +44,7 @@ HTTPClient http;
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm
-static const long alarmTimeout = 180000;
+static const long alarmTimeout = 30000;
 
 // Door time counting
 // Previous time
@@ -57,10 +57,10 @@ static const long doorExitTimeout = 10000;
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
 // Time that allows the tamper line to be opened when the alarm is deactivated
-static const long tamperTimeout = 5000;
+static const long tamperTimeout = 20000;
 
 // Board Pin setup
-static const int h24Pin = A0, doorPin = D1, sirenPin = D2, activeAlarmPin = D8;
+static const int h24Pin = A0, doorPin = D1, sirenPin = D2, activeAlarmPin = D0;
 
 // Define flags
 bool alarmActive = false, inAlarm = false, doorOpened = false, tamperOpened = false, alarmAlert = true;
@@ -75,7 +75,7 @@ void setup()
   pinMode(h24Pin, INPUT);
   pinMode(sirenPin, OUTPUT);
   pinMode(activeAlarmPin, OUTPUT);
-  digitalWrite(sirenPin, LOW);
+  digitalWrite(sirenPin, HIGH);
   digitalWrite(activeAlarmPin, LOW);
 
   Serial.begin(115200);
@@ -185,7 +185,7 @@ void rfidCardScanner()
     if (inAlarm == true)
     {
       setAlarm(false);
-      digitalWrite(sirenPin, LOW);
+      digitalWrite(sirenPin, HIGH);
     }
     else
       setAlarm(!alarmActive);
@@ -244,8 +244,6 @@ void setAlarm(bool value)
   { //SET ALARM TO ON (with exit time)
     if (analogRead(h24Pin) < 800)
     { // If h24Pin is open, send acustic feedback via siren
-      digitalWrite(sirenPin, HIGH);
-      delay(500);
       digitalWrite(sirenPin, LOW);
       delay(500);
       digitalWrite(sirenPin, HIGH);
@@ -255,6 +253,8 @@ void setAlarm(bool value)
       digitalWrite(sirenPin, HIGH);
       delay(500);
       digitalWrite(sirenPin, LOW);
+      delay(500);
+      digitalWrite(sirenPin, HIGH);
     }
     else
     {
@@ -287,12 +287,11 @@ void sirenCheck()
     //Alarm time counting
     if (millis() - alarmPreviousTime <= alarmTimeout)
     {
-      digitalWrite(sirenPin, HIGH);
+      digitalWrite(sirenPin, LOW);
     }
     else
     {
-      //setAlarm(false);
-      digitalWrite(sirenPin, LOW);
+      digitalWrite(sirenPin, HIGH);
     }
 
     if (alarmAlert)
@@ -305,7 +304,7 @@ void sirenCheck()
   {
     alarmAlert = true;
     alarmPreviousTime = millis();
-    digitalWrite(sirenPin, LOW);
+    digitalWrite(sirenPin, HIGH);
   }
 }
 
@@ -379,6 +378,10 @@ void showWebpage()
         content += ", \"alarm\":";
         content += inAlarm ? "true" : "false";
         content += "}";
+      }
+      else if (op == "ifttt")
+      {
+        sendAlarmStatus();
       }
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "application/json", content);
