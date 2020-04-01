@@ -12,10 +12,10 @@
  * Developed by Alessandro Annese 
  * GitHub: Ax3lFernus
  * E-Mail: a.annese99@gmail.com
- * Version v2.6.1 31-03-2020
+ * Version v2.7 01-04-2020
  */
 
-// Load Wi-Fi library
+// Load libraries
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServerSecure.h>
@@ -24,15 +24,19 @@
 #include <ArduinoOTA.h>
 #include <MFRC522.h>
 
-// Network and UID Credentials
-static const char *ssid = "";             //Network SSID
-static const char *password = "";         //Network PASSWORD
-static const char *UID_1 = "";            //1st UID Card Code
-static const char *UID_2 = "";            //2nd UID Card Code
-static const char *API_KEY = "";          //API KEY
-static const char *IFTTT_STATUS_URL = ""; //IFTTT Webhook URL for send status via Telegram
-static const char *IFTTT_ALARM_URL = "";  //IFTTT Webhook URL for send alarm alert via Telegram
-static const char *dname = "";            //Board domain address
+// Varaibles
+static const char *ssid = "";                      //Network SSID
+static const char *password = "";                  //Network PASSWORD
+static const char *UID_1 = "";                     //1st UID Card Code
+static const char *UID_2 = "";                     //2nd UID Card Code
+static const char *API_KEY = "";                   //API KEY
+static const char *IFTTT_STATUS_URL = "";          //IFTTT Webhook URL for send status via Telegram
+static const char iftttFingerprint[] PROGMEM = ""; //IFTTT certificate fingerprints
+static const char *dname = "";                     //Board domain address
+IPAddress ip(0, 0, 0, 0);                          //Set static IP address. If 0.0.0.0 the board will use DHCP.
+IPAddress gateway(192, 168, 1, 254);               //Set the gateway (only if IP was manually set).
+IPAddress subnet(255, 255, 255, 0);                //Set the subnet mask (only if IP was manually set).
+IPAddress dns(8, 8, 8, 8);                         //Set the DNS IP
 
 // Create MFRC522 instance
 MFRC522 mfrc522(D4, D3);
@@ -44,7 +48,7 @@ HTTPClient http;
 // Alarm time counting
 unsigned long alarmPreviousTime = 0;
 // Define siren sound time in case of alarm
-static const long alarmTimeout = 30000;
+static const long alarmTimeout = 180000;
 
 // Door time counting
 // Previous time
@@ -57,7 +61,7 @@ static const long doorExitTimeout = 10000;
 // Tamper time counting
 unsigned long tamperPreviousTime = 0;
 // Time that allows the tamper line to be opened when the alarm is deactivated
-static const long tamperTimeout = 20000;
+static const long tamperTimeout = 180000;
 
 // Board Pin setup
 static const int h24Pin = A0, doorPin = D1, sirenPin = D2, activeAlarmPin = D0;
@@ -69,6 +73,7 @@ bool alarmActive = false, inAlarm = false, doorOpened = false, tamperOpened = fa
 
 // Private key
 
+// Initial board setup
 void setup()
 {
   pinMode(doorPin, INPUT_PULLUP);
@@ -90,8 +95,6 @@ void setup()
       delay(500);
     };
   }
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
   while (!connectToWifi())
   {
     delay(60000);
@@ -102,10 +105,9 @@ void setup()
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH)
       type = "sketch";
-    else // U_SPIFFS
+    else
       type = "filesystem";
 
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
     Serial.println("Start updating " + type);
   });
   ArduinoOTA.onEnd([]() {
@@ -128,8 +130,6 @@ void setup()
       Serial.println("End Failed");
   });
   ArduinoOTA.begin();
-
-  Serial.println("\nConnected.");
   Serial.print("IP address: ");
   Serial.print(WiFi.localIP());
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
@@ -265,7 +265,7 @@ void setAlarm(bool value)
     }
   }
   else
-  { //SET ALARM TO OFF
+  {
     inAlarm = false;
     alarmActive = false;
     digitalWrite(activeAlarmPin, LOW);
@@ -297,7 +297,7 @@ void sirenCheck()
     if (alarmAlert)
     {
       alarmAlert = false;
-      sendAlarmAlert();
+      sendAlarmStatus();
     }
   }
   else
@@ -314,9 +314,12 @@ bool connectToWifi()
 
   Serial.print("\n\nConnecting to ");
   Serial.println(ssid);
-
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-
+  if (ip != IPAddress(0, 0, 0, 0))
+  {
+    WiFi.config(ip, dns, gateway, subnet);
+  }
   for (int i = 0; i < timeout; i++)
   {
     if (WiFi.status() == WL_CONNECTED)
@@ -398,27 +401,18 @@ void sendAlarmStatus()
   if (IFTTT_STATUS_URL != "")
   {
     String url = "value1=";
-    url += alarmActive ? "Attiva" : "Disattiva";
+    url += inAlarm ? "Allarme in corso" : alarmActive ? "Attiva" : "Disattiva";
     url += "&value2=";
     url += digitalRead(doorPin) == HIGH ? "Aperta" : "Chiusa";
     url += "&value3=";
     url += analogRead(h24Pin) < 800 ? "Aperta" : "Chiusa";
-    http.begin(IFTTT_STATUS_URL);
+    http.begin(IFTTT_STATUS_URL, iftttFingerprint);
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    http.POST(url);
-    http.end();
-  }
-}
-
-void sendAlarmAlert()
-{
-  if (IFTTT_ALARM_URL != "")
-  {
-    String url = "value1=";
-    url += inAlarm ? "Allarme in corso" : "Nessun'allarme";
-    http.begin(IFTTT_ALARM_URL);
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    http.POST(url);
+    int code = http.POST(url);
+    if (code < 0)
+    {
+      Serial.printf("HTTP GET failed, error: %s\n", http.errorToString(code).c_str());
+    }
     http.end();
   }
 }

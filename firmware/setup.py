@@ -12,7 +12,7 @@
 # Developed by Alessandro Annese
 # GitHub: Ax3lFernus
 # E-Mail: a.annese99@gmail.com
-# Version v1.4.2 30-03-2020
+# Version v1.5 01-04-2020
 #
 import string
 import secrets
@@ -57,34 +57,65 @@ def setUID(data):
         uid.strip() + "\"; //2nd UID Card Code\n"
 
 
-def generateApiKey(data):
-    api_key = secrets.token_urlsafe(32)
+def setApiKey(data):
+    api_key = input(
+        "Insert API Key (if empty this script will generate it for you - best solution): ")
+    if api_key.strip() == "":
+        api_key = secrets.token_urlsafe(32)
+        print("Your api key is: " + api_key)
+        print("\nWarning: Keep it with care otherwise you will not be able to interact with the APIs.")
+        input("Click ENTER to continue...")
     data[31] = "static const char *API_KEY = \"" + api_key + "\"; //API KEY\n"
-    print("Your api key is: " + api_key)
-    print("\nWarning: Keep it with care otherwise you will not be able to interact with the APIs.")
-    input("Click ENTER to continue...")
 
 
-def setCertificates(data):
-    certificate_path = input("Insert certificate path: ")
-    with open(certificate_path, 'r') as file:
-        certificate = file.read()
-        file.close()
-    key_path = input("Insert private key path: ")
-    with open(key_path, 'r') as file:
-        key = file.read()
-        file.close()
-    index = 0
-    while(not "void setup()" in data[index]):
-        if "static const char server" in data[index]:
-            while not ")EOF\";" in data[index]:
-                del data[index]
-        index = index + 1
+def setStatusURL(data):
+    url = input(
+        "Enter the url to communicate with IFTTT in order to send notifications of the alarm status via telegram (in https): ")
+    data[32] = "static const char *IFTTT_STATUS_URL = \"" + \
+        url.strip() + "\"; //IFTTT Webhook URL for send status via Telegram\n"
+    setFingerprint(data)
 
-    data[68] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
-        certificate + ")EOF\";\n"
-    data[70] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
-        key + ")EOF\";\n"
+
+def setFingerprint(data):
+    fingerprint = input("Enter the IFTTT Certificate Fingerprint (SHA-256): ")
+    if ":" in fingerprint:
+        fingerprint = fingerprint.replace(":", " ")
+    elif "," in fingerprint:
+        fingerprint = fingerprint.replace(",", " ")
+    elif not " " in fingerprint.strip():
+        fingerprint = ' '.join(
+            a+b for a, b in zip(fingerprint[::2], fingerprint[1::2]))
+    data[33] = "const char iftttFingerprint[] PROGMEM = \"" + \
+        fingerprint.strip().upper() + "\"; //IFTTT certificate fingerprint\n"
+    fingerSetted = 1
+
+
+def setDomainName(data):
+    url = input("Enter the domain name of the NodeMCU card: ")
+    data[34] = "static const char *dname = \"" + \
+        url.strip() + "\"; //Board domain address\n"
+
+
+def setStaticIP(data):
+    ip = input("Enter the IP address (es 192.168.1.5): ")
+    if ip.strip() != "":
+        gateway = input("Enter the gateway (default 192.168.1.254): ")
+        if gateway.strip() == "":
+            gateway = "192.168.1.254"
+        subnet = input("Enter the subnet mask (default 255.255.255.0): ")
+        if subnet.strip() == "":
+            subnet = "255.255.255.0"
+        dns = input("Enter the dns server (default 8.8.8.8): ")
+        if dns.strip() == "":
+            dns = "8.8.8.8"
+        data[35] = "IPAddress ip(" + ip.strip().replace('.', ',') + \
+            "); //Set static IP address. If 0.0.0.0 the board will use DHCP.\n"
+        data[36] = "IPAddress gateway(" + gateway.strip().replace(
+            '.', ',') + "); //Set the gateway (only if IP was manually set).\n"
+        data[37] = "IPAddress subnet(" + subnet.strip().replace('.', ',') + \
+            "); //Set the subnet mask (only if IP was manually set).\n"
+        data[38] = "IPAddress dns(" + dns.strip().replace('.',
+                                                          ',') + "); //Set the DNS IP\n"
 
 
 def setTimers(data):
@@ -109,34 +140,36 @@ def setTimers(data):
         tamperTime = int(tamperTime)
     except ValueError:
         tamperTime = 180
-    data[46] = "static const long alarmTimeout = " + \
+    data[50] = "static const long alarmTimeout = " + \
         str(alarmTime * 1000) + ";\n"
-    data[52] = "static const long doorEnterTimeout = " + \
+    data[56] = "static const long doorEnterTimeout = " + \
         str(doorEnter * 1000) + ";\n"
-    data[54] = "static const long doorExitTimeout = " + \
+    data[58] = "static const long doorExitTimeout = " + \
         str(doorExit * 1000) + ";\n"
-    data[59] = "static const long tamperTimeout = " + \
+    data[63] = "static const long tamperTimeout = " + \
         str(tamperTime * 1000) + ";\n"
 
 
-def setStatusURL(data):
-    url = input(
-        "Enter the url to communicate with IFTTT in order to send notifications of the alarm status via telegram (without https): ")
-    data[32] = "static const char *IFTTT_STATUS_URL = \"" + \
-        url.strip() + "\"; //IFTTT Webhook URL for send status via Telegram\n"
+def setCertificates(data):
+    certificate_path = input("Insert certificate path: ")
+    with open(certificate_path, 'r') as file:
+        certificate = file.read()
+        file.close()
+    key_path = input("Insert private key path: ")
+    with open(key_path, 'r') as file:
+        key = file.read()
+        file.close()
+    index = 0
+    while(not "void setup()" in data[index]):
+        if "static const char server" in data[index]:
+            while not ")EOF\";" in data[index]:
+                del data[index]
+        index = index + 1
 
-
-def setAlarmURL(data):
-    url = input(
-        "Enter the url to communicate with IFTTT in order to send the alarm alert via telegram (without https): ")
-    data[33] = "static const char *IFTTT_ALARM_URL = \"" + \
-        url.strip() + "\"; //IFTTT Webhook URL for send alarm alert via Telegram\n"
-
-
-def setDomainName(data):
-    url = input("Enter the domain name of the NodeMCU card: ")
-    data[34] = "static const char *dname = \"" + \
-        url.strip() + "\"; //Board domain address\n"
+    data[72] = "static const char serverCert[] PROGMEM = R\"EOF(\n" + \
+        certificate + ")EOF\";\n"
+    data[74] = "static const char serverKey[] PROGMEM = R\"EOF(\n" + \
+        key + ")EOF\";\n"
 
 
 if __name__ == "__main__":
@@ -145,9 +178,12 @@ if __name__ == "__main__":
     choice = -1
     while not -1 < choice < 10:
         clearConsole()
-        print("NodeMCU Alarm - Script for set firmware variables")
-        print("Select a choice: \n  1 - Set all\n  2 - Set Wi-Fi\n  3 - Set card UID\n  4 - Set alarm timers\n  5 - Generate API KEY\n  6 - Set up the certificate\n  7 - Set IFTT Url for alarm status\n  8 - Set IFTT Url for alarm alert\n  9 - Set the domain name of the board\n  0 - Save and Exit")
-        choice = input("Choice: ")
+        print("NodeMCU Alarm - Script for set firmware variables\n")
+        print("Select a choice: ")
+        print("--Board variables:\n  1 - Set Wi-Fi\n  2 - Set card UID\n  3 - Set alarm timers\n  4 - Set API KEY\n  5 - Set SSL certificate\n  6 - Set board domain")
+        print("--Optional variables:\n  7 - Set IFTT Url for alarm status\n  8 - Set static IP address\n  9 - Set all variables")
+        print("0 - Save and Exit")
+        choice = input("Choice (0 for Save and Exit): ")
         try:
             choice = int(choice)
             clearConsole()
@@ -155,29 +191,29 @@ if __name__ == "__main__":
             choice = -1
         if choice == 1:
             setWiFi(data)
-            setUID(data)
-            setDomainName(data)
-            setTimers(data)
-            generateApiKey(data)
-            setCertificates(data)
-            setStatusURL(data)
-            setAlarmURL(data)
         elif choice == 2:
-            setWiFi(data)
-        elif choice == 3:
             setUID(data)
-        elif choice == 4:
+        elif choice == 3:
             setTimers(data)
+        elif choice == 4:
+            setApiKey(data)
         elif choice == 5:
-            generateApiKey(data)
-        elif choice == 6:
             setCertificates(data)
+        elif choice == 6:
+            setDomainName(data)
         elif choice == 7:
             setStatusURL(data)
         elif choice == 8:
-            setAlarmURL(data)
+            setStaticIP(data)
         elif choice == 9:
+            setWiFi(data)
+            setUID(data)
+            setTimers(data)
+            setApiKey(data)
+            setCertificates(data)
             setDomainName(data)
+            setStatusURL(data)
+            setStaticIP(data)
         if not choice == 0:
             choice = -1
 
